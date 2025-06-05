@@ -75,6 +75,7 @@ export default class Engine {
 
   render(): void {
     this.renderer.render(
+      this.currentFrameKey,
       this.player.position,
       this.player.direction,
       this.currentFrame.data
@@ -82,6 +83,7 @@ export default class Engine {
 
     if (this.debugRenderer) {
       this.debugRenderer.render(
+        this.currentFrameKey,
         this.player.position,
         this.player.direction,
         this.currentFrame.data
@@ -136,6 +138,14 @@ export default class Engine {
 
   private async loadAssets(renderer: Renderer): Promise<void> {
     await renderer.loadAssets("player", this.player.assetRecord);
+    await Promise.all(
+      Object.keys(this.frameRecord).map((frameKey) =>
+        renderer.loadAssets(
+          `frame-${frameKey}`,
+          this.frameRecord[frameKey].assetRecord
+        )
+      )
+    );
   }
 
   private loadFrame(frameKey: string): void {

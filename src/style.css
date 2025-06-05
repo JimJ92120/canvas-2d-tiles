@@ -3,6 +3,7 @@ body {
 
   min-height: 100vh;
   background-color: black;
+  color: white;
 }
 
 body > * {
@@ -22,23 +23,17 @@ body > * {
 .scene {
   background-color: lightblue;
 }
-.debug-scene {
-  display: none;
-  background-color: lightgrey;
-  border: 1px solid red;
-}
-.debug-scene--active {
-  display: block;
-}
 
 .prompt {
   background-color: white;
+  color: black;
 
   display: none;
   position: absolute;
   bottom: 0;
   padding: 1rem;
   width: calc(100% - 2rem);
+  white-space: pre-wrap;
 }
 
 .prompt--active,
@@ -52,6 +47,15 @@ body > * {
 }
 
 /* debug */
+.debug-scene {
+  display: none;
+  background-color: lightgrey;
+  border: 1px solid red;
+}
+.debug-scene--active {
+  display: block;
+}
+
 .app--debug {
   .prompt--active {
     bottom: 50%;

@@ -78,6 +78,7 @@ export default class Renderer {
   }
 
   render(
+    frameKey: string,
     playerPosition: [number, number],
     playerDirection: string,
     data: number[][]
@@ -99,7 +100,7 @@ export default class Renderer {
       this.viewOffset = [0, 0];
     }
 
-    this.renderData(data, tileSize);
+    this.renderData(frameKey, data, tileSize);
     this.renderPlayer(playerPosition, playerDirection, tileSize);
   }
 
@@ -216,7 +217,11 @@ export default class Renderer {
     }
   }
 
-  private renderData(data: number[][], tileSize: [number, number]): void {
+  private renderData(
+    frameKey: string,
+    data: number[][],
+    tileSize: [number, number]
+  ): void {
     const { tile, scene, debug } = this.options;
     let clone = [...data];
 
@@ -248,6 +253,16 @@ export default class Renderer {
           }
         });
       });
+    }
+
+    if (this.assetRecord[`frame-${frameKey}-background`]) {
+      this.context.drawImage(
+        this.assetRecord[`frame-${frameKey}-background`],
+        -this.viewOffset[0] * tileSize[0],
+        -this.viewOffset[1] * tileSize[1],
+        data[0].length * tileSize[0],
+        data.length * tileSize[1]
+      );
     }
   }
 }

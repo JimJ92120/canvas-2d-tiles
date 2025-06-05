@@ -37,5 +37,8 @@ module.exports = {
     static: dist,
     open: false,
   },
+  performance: {
+    hints: false,
+  },
   plugins: [new CopyPlugin([path.resolve(__dirname, "static")])],
 };
