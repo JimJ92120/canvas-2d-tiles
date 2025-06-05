@@ -1,0 +1,55 @@
+body {
+  margin: 0;
+
+  min-height: 100vh;
+  background-color: black;
+}
+
+body > * {
+  box-sizing: border-box;
+}
+
+#app {
+  display: flex;
+  flex-flow: column;
+  margin-left: auto;
+  margin-right: auto;
+
+  position: relative;
+  max-width: 500px;
+}
+
+.scene {
+  background-color: lightblue;
+}
+.debug-scene {
+  display: none;
+  background-color: lightgrey;
+  border: 1px solid red;
+}
+.debug-scene--active {
+  display: block;
+}
+
+.prompt {
+  background-color: white;
+
+  display: none;
+  position: absolute;
+  bottom: 0;
+  padding: 1rem;
+  width: calc(100% - 2rem);
+}
+
+.prompt--active,
+.prompt--active-debug {
+  display: block;
+}
+.prompt--active-debug {
+  bottom: 50%;
+}
+.prompt * {
+  font-size: 1rem;
+  margin: 0;
+  padding: 0;
+}
