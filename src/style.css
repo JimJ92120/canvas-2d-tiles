@@ -45,11 +45,15 @@ body > * {
 .prompt--active-debug {
   display: block;
 }
-.prompt--active-debug {
-  bottom: 50%;
-}
 .prompt * {
   font-size: 1rem;
   margin: 0;
   padding: 0;
+}
+
+/* debug */
+.app--debug {
+  .prompt--active {
+    bottom: 50%;
+  }
 }

@@ -54,7 +54,7 @@ document.addEventListener("DOMContentLoaded", async () => {
     rendererOptions.$debugScene = app.$container.querySelector(".debug-scene")!;
     rendererOptions.$debugScene.classList.add("debug-scene--active");
 
-    promptOptions.activeClassName = "prompt--active-debug";
+    app.$container.classList.add("app--debug");
   }
 
   const engine = new Engine(
