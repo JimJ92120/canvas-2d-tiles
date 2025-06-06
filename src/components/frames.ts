@@ -1,6 +1,6 @@
-import Frame, { FrameActionType } from "./engine/Frame";
+import Frame, { FrameActionType } from "../engine/Frame";
 
-import MapBackgroundImage from "./assets/map.png";
+import MapBackgroundImage from "../assets/map.png";
 
 export const map = new Frame(
   [

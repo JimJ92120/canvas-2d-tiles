@@ -1,4 +1,4 @@
-import Engine from "./engine";
+import Engine from "../engine";
 
 export function loadKeyboardEvents(engine: Engine): void {
   document.addEventListener("keyup", async (event: KeyboardEvent) => {

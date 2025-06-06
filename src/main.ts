@@ -2,19 +2,13 @@ import "./style.css";
 
 import App from "./App";
 
-import Engine, {
-  EngineRendererOptions,
-  EnginePromptOptions,
-  EngineFrameRecord,
-} from "./engine";
+import Engine from "./engine";
 
 import { getScreenSize } from "./helpers";
 
-import { map, home } from "./frames";
-import { player } from "./characters";
-import { loadKeyboardEvents } from "./events";
-import { RendererMode } from "./engine/Renderer";
+import { loadKeyboardEvents } from "./components/events";
 import TypePrompt from "./animations/TypePrompt";
+import { EngineOptions } from "./options";
 
 const DEBUG: boolean = true;
 const MAX_SCENE_SIZE: number = 500;
@@ -31,48 +25,18 @@ document.addEventListener("DOMContentLoaded", async () => {
     app.$container.classList.add("app--debug");
   }
 
-  let rendererOptions: EngineRendererOptions = {
-    $scene: app.$container.querySelector(".scene")!,
-    viewOffset: [0, 0],
-    mapScene: !DEBUG
-      ? null
-      : {
-          $scene: app.$container.querySelector(".debug-scene")!,
-          mode: RendererMode.Raw,
-        },
-    options: {
-      mode: RendererMode.Default,
-      scene: {
-        size: [screenSize, screenSize],
-        minimumFrameSize: MINIMUM_FRAME_SIZE,
-      },
-      tile: {
-        colors: {
-          1: "grey",
-          2: "blue",
-          3: "green",
-        },
-      },
-      characters: {
-        player: {
-          color: "red",
-        },
-      },
-    },
-  };
-  const promptOptions: EnginePromptOptions = {
-    $prompt: app.$container.querySelector(".prompt")!,
-    activeClassName: "prompt--active",
-    animationRecord: {},
-  };
-  const frameRecord: EngineFrameRecord = {
-    main: map,
-    home,
-  };
+  let options = EngineOptions(
+    app.$container.querySelector(".scene")!,
+    app.$container.querySelector(".debug-scene")!,
+    app.$container.querySelector(".prompt")!,
+    screenSize,
+    MINIMUM_FRAME_SIZE,
+    true
+  );
 
   //
-  const typePrompt = new TypePrompt(promptOptions.$prompt);
-  promptOptions.animationRecord = {
+  const typePrompt = new TypePrompt(options.prompt.$prompt);
+  options.prompt.animationRecord = {
     onShow: (_, content) =>
       new Promise(async (resolve) => {
         await typePrompt.type(content, 50);
@@ -89,10 +53,10 @@ document.addEventListener("DOMContentLoaded", async () => {
 
   //
   const engine = new Engine(
-    player,
-    frameRecord,
-    rendererOptions,
-    promptOptions
+    options.player,
+    options.frameRecord,
+    options.renderer,
+    options.prompt
   );
 
   await engine.init();
