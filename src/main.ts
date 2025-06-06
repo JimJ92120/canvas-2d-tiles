@@ -14,6 +14,7 @@ import { map, home } from "./frames";
 import { player } from "./characters";
 import { loadKeyboardEvents } from "./events";
 import { RendererMode } from "./engine/Renderer";
+import TypePrompt from "./animations/TypePrompt";
 
 const DEBUG: boolean = true;
 const MAX_SCENE_SIZE: number = 500;
@@ -62,12 +63,31 @@ document.addEventListener("DOMContentLoaded", async () => {
   const promptOptions: EnginePromptOptions = {
     $prompt: app.$container.querySelector(".prompt")!,
     activeClassName: "prompt--active",
+    animationRecord: {},
   };
   const frameRecord: EngineFrameRecord = {
     main: map,
     home,
   };
 
+  //
+  const typePrompt = new TypePrompt(promptOptions.$prompt);
+  promptOptions.animationRecord = {
+    onShow: (_, content) =>
+      new Promise(async (resolve) => {
+        await typePrompt.type(content, 50);
+
+        resolve();
+      }),
+    onHide: () =>
+      new Promise((resolve) => {
+        typePrompt.clear();
+
+        resolve();
+      }),
+  };
+
+  //
   const engine = new Engine(
     player,
     frameRecord,

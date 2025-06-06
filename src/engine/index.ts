@@ -15,6 +15,7 @@ export type EngineRendererOptions = {
 export type EnginePromptOptions = {
   $prompt: Prompt["$container"];
   activeClassName: Prompt["activeClassName"];
+  animationRecord: Prompt["animationRecord"];
 };
 export type EngineFrameRecord = {
   main?: Frame;
@@ -55,7 +56,8 @@ export default class Engine {
     }
     this.prompt = new Prompt(
       promptOptions.$prompt,
-      promptOptions.activeClassName
+      promptOptions.activeClassName,
+      promptOptions.animationRecord
     );
   }
 
@@ -108,8 +110,8 @@ export default class Engine {
     }
   }
 
-  nextOrHidePrompt(): boolean {
-    if (this.prompt.next()) {
+  async nextOrHidePrompt(): Promise<boolean> {
+    if (await this.prompt.next()) {
       return true;
     }
 
@@ -118,8 +120,8 @@ export default class Engine {
     return false;
   }
 
-  movePlayer(directionKey: string): boolean {
-    this.prompt.hide();
+  async movePlayer(directionKey: string): Promise<boolean> {
+    await this.prompt.hide();
 
     const direction = this.getDirectionFromKey(directionKey);
 
@@ -262,11 +264,11 @@ export default class Engine {
     return nextPosition;
   }
 
-  private runFrameAction(position: [number, number]): void {
-    this.currentFrame.runAction(position, (action) => {
+  private async runFrameAction(position: [number, number]): Promise<void> {
+    await this.currentFrame.runAction(position, async (action) => {
       switch (action.type) {
         case FrameActionType.Prompt:
-          this.prompt.show(action.data);
+          await this.prompt.show(action.data);
           break;
 
         case FrameActionType.Load:

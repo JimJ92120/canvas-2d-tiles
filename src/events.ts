@@ -1,20 +1,20 @@
 import Engine from "./engine";
 
 export function loadKeyboardEvents(engine: Engine): void {
-  document.addEventListener("keyup", (event: KeyboardEvent) => {
+  document.addEventListener("keyup", async (event: KeyboardEvent) => {
     switch (event.key) {
       case "ArrowUp":
       case "ArrowDown":
       case "ArrowLeft":
       case "ArrowRight":
-        engine.movePlayer(event.key.replace("Arrow", "").toLowerCase());
+        await engine.movePlayer(event.key.replace("Arrow", "").toLowerCase());
         engine.render();
 
         break;
 
       case "Escape":
       case " ":
-        engine.nextOrHidePrompt();
+        await engine.nextOrHidePrompt();
         break;
 
       default:
