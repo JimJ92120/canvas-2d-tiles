@@ -248,6 +248,8 @@ export default class Renderer {
         tileSize[0],
         tileSize[1]
       );
+    } else if (RendererMode.Default === this.options.mode) {
+      this.renderRawPlayer(playerPosition, playerDirection, tileSize);
     }
   }
 
@@ -297,6 +299,8 @@ export default class Renderer {
         data[0].length * tileSize[0],
         data.length * tileSize[1]
       );
+    } else if (RendererMode.Default === this.options.mode) {
+      this.renderRawData(data, tileSize);
     }
   }
 }
