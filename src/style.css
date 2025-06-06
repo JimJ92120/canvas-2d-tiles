@@ -22,11 +22,13 @@ body > * {
 
 .scene {
   background-color: lightblue;
+  image-rendering: pixelated;
 }
 .debug-scene {
   display: none;
   background-color: lightgrey;
   border: 1px solid red;
+  image-rendering: pixelated;
 }
 
 .prompt {

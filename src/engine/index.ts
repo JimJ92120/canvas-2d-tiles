@@ -29,6 +29,7 @@ export default class Engine {
   private mapRenderer: Renderer | null = null;
   private prompt: Prompt;
   private mainFrameLastPosition: [number, number] = [0, 0];
+  private isPlayerMoving: boolean = false;
 
   constructor(
     player: Character,
@@ -91,7 +92,9 @@ export default class Engine {
   }
 
   render(): void {
-    const spriteOffset = this.getPlayerSpriteOffset(this.player.direction);
+    const spriteOffset = this.player.sprite.directionsOffset[
+      this.player.direction
+    ] ?? [0, 0];
 
     this.renderer.render(
       this.currentFrame.background.name,
@@ -126,19 +129,23 @@ export default class Engine {
     return false;
   }
 
-  async movePlayer(directionKey: string): Promise<boolean> {
+  async movePlayer(directionKey: string): Promise<void> {
+    if (this.isPlayerMoving) {
+      return;
+    }
+
     await this.prompt.hide();
 
     const direction = this.getDirectionFromKey(directionKey);
 
     if (!direction) {
-      return false;
+      return;
     }
 
     const nextPosition = this.getPlayerPositionFromDirection(direction);
 
     if (!this.isPositionValid(nextPosition)) {
-      return false;
+      return;
     }
 
     const nextPositionValue =
@@ -146,23 +153,23 @@ export default class Engine {
 
     this.player.direction = direction;
 
+    await this.animatePlayer(direction);
+
     switch (nextPositionValue) {
       case FrameDataValue.Empty:
         this.player.position = nextPosition;
-        return true;
-
-      case FrameDataValue.Block:
-      case FrameDataValue.Building:
-        return false;
+        break;
 
       case FrameDataValue.Action:
         this.runFrameAction(nextPosition);
+        break;
 
-        return true;
-
-      default:
-        return false;
+      case FrameDataValue.Block:
+      case FrameDataValue.Building:
+        break;
     }
+
+    this.render();
   }
 
   private async loadAssets(renderer: Renderer): Promise<void> {
@@ -274,17 +281,22 @@ export default class Engine {
     return nextPosition;
   }
 
-  private getPlayerSpriteOffset(direction: Direction): [number, number] {
-    switch (direction) {
-      case Direction.Up:
-      case Direction.Down:
-      case Direction.Left:
-      case Direction.Right:
-        return this.player.sprite.states[direction];
+  private async animatePlayer(direction: Direction): Promise<void> {
+    const animationOffset = this.player.sprite.animationsOffsetList[direction];
 
-      default:
-        return [0, 0];
+    if (!animationOffset) {
+      return;
     }
+
+    this.isPlayerMoving = true;
+    await this.renderer.animateCharacter(
+      this.currentFrame.background.name,
+      this.player.sprite.name,
+      this.player.position,
+      animationOffset,
+      this.currentFrame.data
+    );
+    this.isPlayerMoving = false;
   }
 
   private async runFrameAction(position: [number, number]): Promise<void> {

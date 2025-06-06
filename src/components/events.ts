@@ -8,7 +8,6 @@ export function loadKeyboardEvents(engine: Engine): void {
       case "ArrowLeft":
       case "ArrowRight":
         await engine.movePlayer(event.key.replace("Arrow", "").toLowerCase());
-        engine.render();
 
         break;
 

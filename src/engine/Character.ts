@@ -8,8 +8,11 @@ export enum Direction {
 export type CharacterSprite = {
   name: string;
   asset: string;
-  states: {
+  directionsOffset: {
     [key: string]: [number, number];
+  };
+  animationsOffsetList: {
+    [key: string]: [number, number][];
   };
 };
 
