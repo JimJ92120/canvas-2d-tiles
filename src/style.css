@@ -23,6 +23,11 @@ body > * {
 .scene {
   background-color: lightblue;
 }
+.debug-scene {
+  display: none;
+  background-color: lightgrey;
+  border: 1px solid red;
+}
 
 .prompt {
   background-color: white;
@@ -47,16 +52,11 @@ body > * {
 }
 
 /* debug */
-.debug-scene {
-  display: none;
-  background-color: lightgrey;
-  border: 1px solid red;
-}
-.debug-scene--active {
-  display: block;
-}
-
 .app--debug {
+  .debug-scene {
+    display: block;
+  }
+
   .prompt--active {
     bottom: 50%;
   }

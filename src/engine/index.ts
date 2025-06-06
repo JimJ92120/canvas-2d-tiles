@@ -5,10 +5,10 @@ import Character, { Direction } from "./Character";
 
 export type EngineRendererOptions = {
   $scene: Renderer["$scene"];
-  mapScene?: {
+  mapScene: {
     $scene: Renderer["$scene"];
     mode: RendererMode;
-  };
+  } | null;
   viewOffset: Renderer["viewOffset"];
   options: Renderer["options"];
 };

@@ -26,9 +26,19 @@ document.addEventListener("DOMContentLoaded", async () => {
   app.render();
   app.$container.style.maxWidth = `${screenSize}px`;
 
+  if (DEBUG) {
+    app.$container.classList.add("app--debug");
+  }
+
   let rendererOptions: EngineRendererOptions = {
     $scene: app.$container.querySelector(".scene")!,
     viewOffset: [0, 0],
+    mapScene: !DEBUG
+      ? null
+      : {
+          $scene: app.$container.querySelector(".debug-scene")!,
+          mode: RendererMode.Raw,
+        },
     options: {
       mode: RendererMode.Default,
       scene: {
@@ -57,15 +67,6 @@ document.addEventListener("DOMContentLoaded", async () => {
     main: map,
     home,
   };
-
-  if (DEBUG) {
-    rendererOptions.mapScene = {
-      $scene: app.$container.querySelector(".debug-scene")!,
-      mode: RendererMode.Raw,
-    };
-    rendererOptions.mapScene.$scene.classList.add("debug-scene--active");
-    app.$container.classList.add("app--debug");
-  }
 
   const engine = new Engine(
     player,
