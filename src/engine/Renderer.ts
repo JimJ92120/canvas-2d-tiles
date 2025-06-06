@@ -342,10 +342,12 @@ export default class Renderer {
     if (characterAsset) {
       this.context.drawImage(
         characterAsset,
-        spriteOffset[0] * tileSize[0],
-        spriteOffset[1] * tileSize[1],
+
+        (characterAsset.width / 4) * spriteOffset[0],
+        (characterAsset.height / 4) * spriteOffset[1],
         tileSize[0],
         tileSize[1],
+
         position[0],
         position[1],
         tileSize[0],

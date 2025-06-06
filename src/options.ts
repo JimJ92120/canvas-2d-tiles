@@ -38,7 +38,7 @@ export function EngineOptions(
         size: [screenSize, screenSize],
         minimumFrameSize,
       },
-      animationDuration: 100,
+      animationDuration: 150,
       tile: {
         colors: {
           1: "grey",
