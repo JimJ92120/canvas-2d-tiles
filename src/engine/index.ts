@@ -91,6 +91,7 @@ export default class Engine {
   render(): void {
     this.renderer.render(
       this.currentFrameKey,
+      "player",
       this.player.position,
       this.player.direction,
       this.currentFrame.data
@@ -99,6 +100,7 @@ export default class Engine {
     if (this.mapRenderer) {
       this.mapRenderer.render(
         this.currentFrameKey,
+        "player",
         this.player.position,
         this.player.direction,
         this.currentFrame.data

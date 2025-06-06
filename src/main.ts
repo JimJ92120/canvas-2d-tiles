@@ -35,8 +35,10 @@ document.addEventListener("DOMContentLoaded", async () => {
       tile: {
         colors: CONFIG.TILE_COLORS,
       },
-      player: {
-        color: CONFIG.PLAYER_COLOR,
+      characters: {
+        player: {
+          color: CONFIG.PLAYER_COLOR,
+        },
       },
     },
   };

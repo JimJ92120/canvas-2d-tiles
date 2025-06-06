@@ -12,9 +12,7 @@ export type RendererOptions = {
   tile: {
     colors: { [key: number]: string };
   };
-  player: {
-    color: string;
-  };
+  characters: { [key: string]: { color: string } };
 };
 
 export default class Renderer {
@@ -84,8 +82,9 @@ export default class Renderer {
 
   render(
     frameKey: string,
-    playerPosition: [number, number],
-    playerDirection: string,
+    characterKey: string,
+    characterPosition: [number, number],
+    characterDirection: string,
     data: number[][]
   ): void {
     const { scene, mode } = this.options;
@@ -100,32 +99,52 @@ export default class Renderer {
       (scene.minimumFrameSize[0] < dataSize[0] ||
         scene.minimumFrameSize[1] < dataSize[1])
     ) {
-      this.focus(playerPosition, dataSize);
+      this.focus(characterPosition, dataSize);
     } else if (0 !== this.viewOffset[0] || 0 !== this.viewOffset[1]) {
       this.viewOffset = [0, 0];
     }
 
     const position: [number, number] = [
-      (playerPosition[0] - this.viewOffset[0]) * tileSize[0],
-      (playerPosition[1] - this.viewOffset[1]) * tileSize[1],
+      (characterPosition[0] - this.viewOffset[0]) * tileSize[0],
+      (characterPosition[1] - this.viewOffset[1]) * tileSize[1],
     ];
 
     switch (mode) {
       case RendererMode.All:
         this.renderRawData(data, tileSize);
         this.renderDataWithAssets(frameKey, data, tileSize);
-        this.renderRawPlayer(position, playerDirection, tileSize);
-        this.renderPlayerWithAssets(position, playerDirection, tileSize);
+        this.renderRawCharacter(
+          characterKey,
+          position,
+          characterDirection,
+          tileSize
+        );
+        this.renderCharacterWithAssets(
+          characterKey,
+          position,
+          characterDirection,
+          tileSize
+        );
         break;
 
       case RendererMode.Default:
         this.renderDataWithAssets(frameKey, data, tileSize);
-        this.renderPlayerWithAssets(position, playerDirection, tileSize);
+        this.renderCharacterWithAssets(
+          characterKey,
+          position,
+          characterDirection,
+          tileSize
+        );
         break;
 
       case RendererMode.Raw:
         this.renderRawData(data, tileSize);
-        this.renderRawPlayer(position, playerDirection, tileSize);
+        this.renderRawCharacter(
+          characterKey,
+          position,
+          characterDirection,
+          tileSize
+        );
         break;
     }
   }
@@ -178,27 +197,28 @@ export default class Renderer {
     }) as Promise<HTMLImageElement>;
   }
 
-  private renderRawPlayer(
-    playerPosition: [number, number],
-    playerDirection: string,
+  private renderRawCharacter(
+    characterKey: string,
+    characterPosition: [number, number],
+    characterDirection: string,
     tileSize: [number, number]
   ): void {
-    const { player } = this.options;
+    const { characters } = this.options;
 
-    this.context.fillStyle = player.color;
+    this.context.fillStyle = characters[characterKey].color;
     this.context.fillRect(
-      playerPosition[0],
-      playerPosition[1],
+      characterPosition[0],
+      characterPosition[1],
       tileSize[0],
       tileSize[1]
     );
 
     let directionMarkPosition: [number, number] = [
-      playerPosition[0],
-      playerPosition[1],
+      characterPosition[0],
+      characterPosition[1],
     ];
 
-    switch (playerDirection) {
+    switch (characterDirection) {
       case "up":
         directionMarkPosition[0] += tileSize[0] / 2;
         break;
@@ -226,30 +246,37 @@ export default class Renderer {
 
     this.context.beginPath();
     this.context.moveTo(
-      playerPosition[0] + tileSize[0] / 2,
-      playerPosition[1] + tileSize[1] / 2
+      characterPosition[0] + tileSize[0] / 2,
+      characterPosition[1] + tileSize[1] / 2
     );
     this.context.lineTo(directionMarkPosition[0], directionMarkPosition[1]);
     this.context.stroke();
   }
 
-  private renderPlayerWithAssets(
-    playerPosition: [number, number],
-    playerDirection: string,
+  private renderCharacterWithAssets(
+    characterKey: string,
+    characterPosition: [number, number],
+    characterDirection: string,
     tileSize: [number, number]
   ): void {
-    const playerAsset = this.assetRecord[`player-${playerDirection}`];
+    const characterAsset =
+      this.assetRecord[`${characterKey}-${characterDirection}`];
 
-    if (playerAsset) {
+    if (characterAsset) {
       this.context.drawImage(
-        playerAsset,
-        playerPosition[0],
-        playerPosition[1],
+        characterAsset,
+        characterPosition[0],
+        characterPosition[1],
         tileSize[0],
         tileSize[1]
       );
     } else if (RendererMode.Default === this.options.mode) {
-      this.renderRawPlayer(playerPosition, playerDirection, tileSize);
+      this.renderRawCharacter(
+        characterKey,
+        characterPosition,
+        characterDirection,
+        tileSize
+      );
     }
   }
 
