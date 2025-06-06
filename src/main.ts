@@ -9,15 +9,18 @@ import Engine, {
 } from "./engine";
 
 import { getScreenSize } from "./helpers";
-import CONFIG from "./config";
 
 import { map, home } from "./frames";
 import { player } from "./characters";
 import { loadKeyboardEvents } from "./events";
 import { RendererMode } from "./engine/Renderer";
 
+const DEBUG: boolean = true;
+const MAX_SCENE_SIZE: number = 500;
+const MINIMUM_FRAME_SIZE: [number, number] = [10, 10];
+
 document.addEventListener("DOMContentLoaded", async () => {
-  const screenSize = getScreenSize(CONFIG.MAX_SCENE_SIZE);
+  const screenSize = getScreenSize(MAX_SCENE_SIZE);
 
   const app = new App(document.querySelector("#app")!);
   app.render();
@@ -30,14 +33,18 @@ document.addEventListener("DOMContentLoaded", async () => {
       mode: RendererMode.Default,
       scene: {
         size: [screenSize, screenSize],
-        minimumFrameSize: CONFIG.MINIMUM_FRAME_SIZE,
+        minimumFrameSize: MINIMUM_FRAME_SIZE,
       },
       tile: {
-        colors: CONFIG.TILE_COLORS,
+        colors: {
+          1: "grey",
+          2: "blue",
+          3: "green",
+        },
       },
       characters: {
         player: {
-          color: CONFIG.PLAYER_COLOR,
+          color: "red",
         },
       },
     },
@@ -51,7 +58,7 @@ document.addEventListener("DOMContentLoaded", async () => {
     home,
   };
 
-  if (CONFIG.DEBUG) {
+  if (DEBUG) {
     rendererOptions.mapScene = {
       $scene: app.$container.querySelector(".debug-scene")!,
       mode: RendererMode.Raw,
