@@ -1,5 +1,10 @@
+export enum RendererMode {
+  Default,
+  Raw,
+  All,
+}
 export type RendererOptions = {
-  debug: boolean;
+  mode: RendererMode;
   scene: {
     size: [number, number];
     minimumFrameSize: [number, number];
@@ -15,7 +20,7 @@ export type RendererOptions = {
 export default class Renderer {
   private $scene: HTMLCanvasElement;
   private context: CanvasRenderingContext2D;
-  private options: RendererOptions;
+  readonly options: RendererOptions;
   private viewOffset: [number, number];
   private assetRecord: { [key: string]: HTMLImageElement } = {};
 
@@ -83,7 +88,7 @@ export default class Renderer {
     playerDirection: string,
     data: number[][]
   ): void {
-    const { scene } = this.options;
+    const { scene, mode } = this.options;
 
     this.context.clearRect(0, 0, this.width, this.height);
 
@@ -100,8 +105,29 @@ export default class Renderer {
       this.viewOffset = [0, 0];
     }
 
-    this.renderData(frameKey, data, tileSize);
-    this.renderPlayer(playerPosition, playerDirection, tileSize);
+    const position: [number, number] = [
+      (playerPosition[0] - this.viewOffset[0]) * tileSize[0],
+      (playerPosition[1] - this.viewOffset[1]) * tileSize[1],
+    ];
+
+    switch (mode) {
+      case RendererMode.All:
+        this.renderRawData(data, tileSize);
+        this.renderDataWithAssets(frameKey, data, tileSize);
+        this.renderRawPlayer(position, playerDirection, tileSize);
+        this.renderPlayerWithAssets(position, playerDirection, tileSize);
+        break;
+
+      case RendererMode.Default:
+        this.renderDataWithAssets(frameKey, data, tileSize);
+        this.renderPlayerWithAssets(position, playerDirection, tileSize);
+        break;
+
+      case RendererMode.Raw:
+        this.renderRawData(data, tileSize);
+        this.renderRawPlayer(position, playerDirection, tileSize);
+        break;
+    }
   }
 
   focus(position: [number, number], frameSize: [number, number]): void {
@@ -152,77 +178,81 @@ export default class Renderer {
     }) as Promise<HTMLImageElement>;
   }
 
-  private renderPlayer(
+  private renderRawPlayer(
     playerPosition: [number, number],
     playerDirection: string,
     tileSize: [number, number]
   ): void {
-    const { player, debug } = this.options;
-    const position: [number, number] = [
-      (playerPosition[0] - this.viewOffset[0]) * tileSize[0],
-      (playerPosition[1] - this.viewOffset[1]) * tileSize[1],
+    const { player } = this.options;
+
+    this.context.fillStyle = player.color;
+    this.context.fillRect(
+      playerPosition[0],
+      playerPosition[1],
+      tileSize[0],
+      tileSize[1]
+    );
+
+    let directionMarkPosition: [number, number] = [
+      playerPosition[0],
+      playerPosition[1],
     ];
 
-    if (debug) {
-      this.context.fillStyle = player.color;
-      this.context.fillRect(position[0], position[1], tileSize[0], tileSize[1]);
+    switch (playerDirection) {
+      case "up":
+        directionMarkPosition[0] += tileSize[0] / 2;
+        break;
 
-      let directionMarkPosition: [number, number] = [position[0], position[1]];
+      case "down":
+        directionMarkPosition[0] += tileSize[0] / 2;
+        directionMarkPosition[1] += tileSize[1];
+        break;
 
-      switch (playerDirection) {
-        case "up":
-          directionMarkPosition[0] += tileSize[0] / 2;
-          break;
+      case "left":
+        directionMarkPosition[1] += tileSize[1] / 2;
+        break;
 
-        case "down":
-          directionMarkPosition[0] += tileSize[0] / 2;
-          directionMarkPosition[1] += tileSize[1];
-          break;
+      case "right":
+        directionMarkPosition[0] += tileSize[0];
+        directionMarkPosition[1] += tileSize[1] / 2;
+        break;
 
-        case "left":
-          directionMarkPosition[1] += tileSize[1] / 2;
-          break;
-
-        case "right":
-          directionMarkPosition[0] += tileSize[0];
-          directionMarkPosition[1] += tileSize[1] / 2;
-          break;
-
-        default:
-          return;
-      }
-
-      this.context.strokeStyle = "black";
-      this.context.lineWidth = 5;
-
-      this.context.beginPath();
-      this.context.moveTo(
-        position[0] + tileSize[0] / 2,
-        position[1] + tileSize[1] / 2
-      );
-      this.context.lineTo(directionMarkPosition[0], directionMarkPosition[1]);
-      this.context.stroke();
+      default:
+        return;
     }
 
+    this.context.strokeStyle = "black";
+    this.context.lineWidth = 5;
+
+    this.context.beginPath();
+    this.context.moveTo(
+      playerPosition[0] + tileSize[0] / 2,
+      playerPosition[1] + tileSize[1] / 2
+    );
+    this.context.lineTo(directionMarkPosition[0], directionMarkPosition[1]);
+    this.context.stroke();
+  }
+
+  private renderPlayerWithAssets(
+    playerPosition: [number, number],
+    playerDirection: string,
+    tileSize: [number, number]
+  ): void {
     const playerAsset = this.assetRecord[`player-${playerDirection}`];
 
     if (playerAsset) {
       this.context.drawImage(
         playerAsset,
-        position[0],
-        position[1],
+        playerPosition[0],
+        playerPosition[1],
         tileSize[0],
         tileSize[1]
       );
     }
   }
 
-  private renderData(
-    frameKey: string,
-    data: number[][],
-    tileSize: [number, number]
-  ): void {
-    const { tile, scene, debug } = this.options;
+  private renderRawData(data: number[][], tileSize: [number, number]): void {
+    const { tile, scene } = this.options;
     let clone = [...data];
 
     if (scene.minimumFrameSize) {
@@ -239,22 +269,26 @@ export default class Renderer {
         );
     }
 
-    if (debug) {
-      clone.map((row, rowIndex) => {
-        row.map((cellValue, columnIndex) => {
-          if (cellValue && tile.colors[cellValue]) {
-            this.context.fillStyle = tile.colors[cellValue];
-            this.context.fillRect(
-              columnIndex * tileSize[0],
-              rowIndex * tileSize[1],
-              tileSize[0],
-              tileSize[1]
-            );
-          }
-        });
+    clone.map((row, rowIndex) => {
+      row.map((cellValue, columnIndex) => {
+        if (cellValue && tile.colors[cellValue]) {
+          this.context.fillStyle = tile.colors[cellValue];
+          this.context.fillRect(
+            columnIndex * tileSize[0],
+            rowIndex * tileSize[1],
+            tileSize[0],
+            tileSize[1]
+          );
+        }
       });
-    }
+    });
+  }
 
+  private renderDataWithAssets(
+    frameKey: string,
+    data: number[][],
+    tileSize: [number, number]
+  ): void {
     if (this.assetRecord[`frame-${frameKey}-background`]) {
       this.context.drawImage(
         this.assetRecord[`frame-${frameKey}-background`],

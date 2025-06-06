@@ -14,6 +14,7 @@ import CONFIG from "./config";
 import { map, home } from "./frames";
 import { player } from "./characters";
 import { loadKeyboardEvents } from "./events";
+import { RendererMode } from "./engine/Renderer";
 
 document.addEventListener("DOMContentLoaded", async () => {
   const screenSize = getScreenSize(CONFIG.MAX_SCENE_SIZE);
@@ -24,10 +25,9 @@ document.addEventListener("DOMContentLoaded", async () => {
 
   let rendererOptions: EngineRendererOptions = {
     $scene: app.$container.querySelector(".scene")!,
-    $debugScene: null,
     viewOffset: [0, 0],
     options: {
-      debug: true,
+      mode: RendererMode.Default,
       scene: {
         size: [screenSize, screenSize],
         minimumFrameSize: CONFIG.MINIMUM_FRAME_SIZE,
@@ -40,7 +40,7 @@ document.addEventListener("DOMContentLoaded", async () => {
       },
     },
   };
-  let promptOptions: EnginePromptOptions = {
+  const promptOptions: EnginePromptOptions = {
     $prompt: app.$container.querySelector(".prompt")!,
     activeClassName: "prompt--active",
   };
@@ -50,10 +50,11 @@ document.addEventListener("DOMContentLoaded", async () => {
   };
 
   if (CONFIG.DEBUG) {
-    rendererOptions.options.debug = CONFIG.DEBUG;
-    rendererOptions.$debugScene = app.$container.querySelector(".debug-scene")!;
-    rendererOptions.$debugScene.classList.add("debug-scene--active");
-
+    rendererOptions.mapScene = {
+      $scene: app.$container.querySelector(".debug-scene")!,
+      mode: RendererMode.Raw,
+    };
+    rendererOptions.mapScene.$scene.classList.add("debug-scene--active");
     app.$container.classList.add("app--debug");
   }
 

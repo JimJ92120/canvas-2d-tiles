@@ -1,11 +1,14 @@
 import Prompt from "./Prompt";
-import Renderer from "./Renderer";
+import Renderer, { RendererMode } from "./Renderer";
 import Frame, { FrameActionType, FrameDataValue } from "./Frame";
 import Character, { Direction } from "./Character";
 
 export type EngineRendererOptions = {
   $scene: Renderer["$scene"];
-  $debugScene: Renderer["$scene"] | null;
+  mapScene?: {
+    $scene: Renderer["$scene"];
+    mode: RendererMode;
+  };
   viewOffset: Renderer["viewOffset"];
   options: Renderer["options"];
 };
@@ -22,7 +25,7 @@ export default class Engine {
   private currentFrameKey: string = "main";
   readonly player: Character;
   private renderer: Renderer;
-  private debugRenderer: Renderer | null = null;
+  private mapRenderer: Renderer | null = null;
   private prompt: Prompt;
   private mainFrameLastPosition: [number, number] = [0, 0];
 
@@ -40,10 +43,10 @@ export default class Engine {
       rendererOptions.options
     );
 
-    if (rendererOptions.$debugScene) {
-      this.debugRenderer = new Renderer(rendererOptions.$debugScene, [0, 0], {
+    if (rendererOptions.mapScene) {
+      this.mapRenderer = new Renderer(rendererOptions.mapScene.$scene, [0, 0], {
         ...rendererOptions.options,
-        debug: true,
+        mode: rendererOptions.mapScene.mode,
         scene: {
           size: [...rendererOptions.options.scene.size],
           minimumFrameSize: [0, 0],
@@ -70,8 +73,16 @@ export default class Engine {
     this.renderer.init();
     await this.loadAssets(this.renderer);
 
-    if (this.debugRenderer) {
-      this.debugRenderer.init();
+    if (this.mapRenderer) {
+      this.mapRenderer.init();
+
+      if (
+        [RendererMode.Default, RendererMode.All].includes(
+          this.mapRenderer.options.mode
+        )
+      ) {
+        await this.loadAssets(this.mapRenderer);
+      }
     }
 
     this.render();
@@ -85,8 +96,8 @@ export default class Engine {
       this.currentFrame.data
     );
 
-    if (this.debugRenderer) {
-      this.debugRenderer.render(
+    if (this.mapRenderer) {
+      this.mapRenderer.render(
         this.currentFrameKey,
         this.player.position,
         this.player.direction,
@@ -175,8 +186,8 @@ export default class Engine {
       this.player.position = this.mainFrameLastPosition;
     }
 
-    if (this.debugRenderer) {
-      this.debugRenderer.resize(
+    if (this.mapRenderer) {
+      this.mapRenderer.resize(
         this.currentFrame.width,
         this.currentFrame.height
       );
