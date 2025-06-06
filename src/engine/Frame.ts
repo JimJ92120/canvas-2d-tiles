@@ -18,22 +18,27 @@ export type FrameActionRecord = { [key: string]: FrameAction };
 
 export type FrameActionRunCallback = (action: FrameAction) => void;
 
+export type FrameBackground = {
+  name: string;
+  asset: string;
+};
+
 export default class Frame {
   readonly data: FrameData;
   readonly actionRecord: FrameActionRecord;
   readonly initialPlayerPosition: [number, number];
-  readonly assetRecord: { [key: string]: string };
+  readonly background: FrameBackground;
 
   constructor(
     data: number[][],
     actionRecord: FrameActionRecord,
     initialPlayerPosition: [number, number],
-    assetRecord: { [key: string]: string }
+    background: FrameBackground
   ) {
     this.data = data;
     this.actionRecord = actionRecord;
     this.initialPlayerPosition = initialPlayerPosition;
-    this.assetRecord = assetRecord;
+    this.background = background;
   }
 
   get width(): number {

@@ -67,24 +67,23 @@ export default class Renderer {
     this.resize(minimumFrameSize[0], minimumFrameSize[1]);
   }
 
-  async loadAssets(
-    prefix: string,
-    assets: {
-      [key: string]: string;
-    }
-  ): Promise<HTMLImageElement[]> {
+  async loadAssets(assets: {
+    [key: string]: string;
+  }): Promise<HTMLImageElement[]> {
     return await Promise.all(
       Object.keys(assets).map((assetKey) =>
-        this.loadImage(`${prefix}-${assetKey}`, assets[assetKey])
+        this.loadImage(assetKey, assets[assetKey])
       )
     );
   }
 
   render(
-    frameKey: string,
+    frameAssetKey: string,
     characterKey: string,
+    characterAssetKey: string,
     characterPosition: [number, number],
     characterDirection: string,
+    spriteOffset: [number, number],
     data: number[][]
   ): void {
     const { scene, mode } = this.options;
@@ -112,27 +111,31 @@ export default class Renderer {
     switch (mode) {
       case RendererMode.All:
         this.renderRawData(data, tileSize);
-        this.renderDataWithAssets(frameKey, data, tileSize);
+        this.renderDataWithAssets(frameAssetKey, data, tileSize);
         this.renderRawCharacter(
           characterKey,
           position,
           characterDirection,
           tileSize
         );
-        this.renderCharacterWithAssets(
+        this.renderCharacterWithSprite(
           characterKey,
+          characterAssetKey,
           position,
           characterDirection,
+          spriteOffset,
           tileSize
         );
         break;
 
       case RendererMode.Default:
-        this.renderDataWithAssets(frameKey, data, tileSize);
-        this.renderCharacterWithAssets(
+        this.renderDataWithAssets(frameAssetKey, data, tileSize);
+        this.renderCharacterWithSprite(
           characterKey,
+          characterAssetKey,
           position,
           characterDirection,
+          spriteOffset,
           tileSize
         );
         break;
@@ -253,18 +256,23 @@ export default class Renderer {
     this.context.stroke();
   }
 
-  private renderCharacterWithAssets(
+  private renderCharacterWithSprite(
     characterKey: string,
+    assetKey: string,
     characterPosition: [number, number],
     characterDirection: string,
+    spriteOffset: [number, number],
     tileSize: [number, number]
   ): void {
-    const characterAsset =
-      this.assetRecord[`${characterKey}-${characterDirection}`];
-
+    const characterAsset = this.assetRecord[assetKey];
     if (characterAsset) {
       this.context.drawImage(
         characterAsset,
+        spriteOffset[0] * tileSize[0],
+        spriteOffset[1] * tileSize[1],
+        tileSize[0],
+        tileSize[1],
+
         characterPosition[0],
         characterPosition[1],
         tileSize[0],
@@ -314,13 +322,13 @@ export default class Renderer {
   }
 
   private renderDataWithAssets(
-    frameKey: string,
+    assetKey: string,
     data: number[][],
     tileSize: [number, number]
   ): void {
-    if (this.assetRecord[`frame-${frameKey}-background`]) {
+    if (this.assetRecord[`${assetKey}`]) {
       this.context.drawImage(
-        this.assetRecord[`frame-${frameKey}-background`],
+        this.assetRecord[`${assetKey}`],
         -this.viewOffset[0] * tileSize[0],
         -this.viewOffset[1] * tileSize[1],
         data[0].length * tileSize[0],

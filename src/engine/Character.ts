@@ -5,21 +5,29 @@ export enum Direction {
   Right = "right",
 }
 
+export type CharacterSprite = {
+  name: string;
+  asset: string;
+  states: {
+    [key: string]: [number, number];
+  };
+};
+
 export default class Character {
   readonly name: string;
   position: [number, number];
   direction: Direction;
-  readonly assetRecord: { [key: string]: string };
+  readonly sprite: CharacterSprite;
 
   constructor(
     name: string,
     position: [number, number],
     direction: Direction,
-    assetRecord: { [key: string]: string }
+    sprite: CharacterSprite
   ) {
     this.name = name;
     this.position = position;
     this.direction = direction;
-    this.assetRecord = assetRecord;
+    this.sprite = sprite;
   }
 }

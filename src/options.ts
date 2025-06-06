@@ -5,7 +5,7 @@ import Engine, {
 } from "./engine";
 import { RendererMode } from "./engine/Renderer";
 
-import { map, home } from "./components/frames";
+import { main, home } from "./components/frames";
 import { player } from "./components/characters";
 
 export type EngineOptions = {
@@ -58,7 +58,7 @@ export function EngineOptions(
     animationRecord: {},
   };
   const frameRecord: EngineFrameRecord = {
-    main: map,
+    main,
     home,
   };
 

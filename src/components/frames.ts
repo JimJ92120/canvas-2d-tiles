@@ -2,7 +2,7 @@ import Frame, { FrameActionType } from "../engine/Frame";
 
 import MapBackgroundImage from "../assets/map.png";
 
-export const map = new Frame(
+export const main = new Frame(
   [
     [1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1],
     [1, 2, 2, 2, 1, 2, 2, 2, 2, 2, 2, 1, 1, 1, 1, 2, 2, 2, 1, 1],
@@ -81,7 +81,8 @@ export const map = new Frame(
   },
   [3, 17],
   {
-    background: MapBackgroundImage,
+    name: "main-background",
+    asset: MapBackgroundImage,
   }
 );
 
@@ -129,5 +130,8 @@ export const home = new Frame(
     },
   },
   [4, 7],
-  {}
+  {
+    name: "home-background",
+    asset: "",
+  }
 );

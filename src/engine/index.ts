@@ -91,11 +91,15 @@ export default class Engine {
   }
 
   render(): void {
+    const spriteOffset = this.getPlayerSpriteOffset(this.player.direction);
+
     this.renderer.render(
-      this.currentFrameKey,
+      this.currentFrame.background.name,
       this.player.name,
+      this.player.sprite.name,
       this.player.position,
       this.player.direction,
+      spriteOffset,
       this.currentFrame.data
     );
 
@@ -103,8 +107,10 @@ export default class Engine {
       this.mapRenderer.render(
         this.currentFrameKey,
         this.player.name,
+        this.player.sprite.name,
         this.player.position,
         this.player.direction,
+        spriteOffset,
         this.currentFrame.data
       );
     }
@@ -160,15 +166,19 @@ export default class Engine {
   }
 
   private async loadAssets(renderer: Renderer): Promise<void> {
-    await renderer.loadAssets(this.player.name, this.player.assetRecord);
-    await Promise.all(
-      Object.keys(this.frameRecord).map((frameKey) =>
-        renderer.loadAssets(
-          `frame-${frameKey}`,
-          this.frameRecord[frameKey].assetRecord
-        )
-      )
-    );
+    const assetRecord = {
+      [this.player.sprite.name]: this.player.sprite.asset,
+      ...Object.keys(this.frameRecord).reduce((_result, frameKey) => {
+        if ("" !== this.frameRecord[frameKey].background.asset) {
+          _result[this.frameRecord[frameKey].background.name] =
+            this.frameRecord[frameKey].background.asset;
+        }
+
+        return _result;
+      }, {} as { [key: string]: string }),
+    };
+
+    await renderer.loadAssets(assetRecord);
   }
 
   private loadFrame(frameKey: string): void {
@@ -262,6 +272,19 @@ export default class Engine {
     }
 
     return nextPosition;
+  }
+
+  private getPlayerSpriteOffset(direction: Direction): [number, number] {
+    switch (direction) {
+      case Direction.Up:
+      case Direction.Down:
+      case Direction.Left:
+      case Direction.Right:
+        return this.player.sprite.states[direction];
+
+      default:
+        return [0, 0];
+    }
   }
 
   private async runFrameAction(position: [number, number]): Promise<void> {
