@@ -56,6 +56,10 @@ export default class Engine {
     );
   }
 
+  get isPromptShown(): boolean {
+    return this.prompt.isShown;
+  }
+
   private get currentFrame(): Frame {
     return this.frameRecord[this.currentFrameKey];
   }
@@ -91,14 +95,18 @@ export default class Engine {
     }
   }
 
-  hidePrompt(): void {
-    if (this.prompt.isShown) {
-      this.prompt.hide();
+  nextOrHidePrompt(): boolean {
+    if (this.prompt.next()) {
+      return true;
     }
+
+    this.prompt.hide();
+
+    return false;
   }
 
   movePlayer(directionKey: string): boolean {
-    this.hidePrompt();
+    this.prompt.hide();
 
     const direction = this.getDirectionFromKey(directionKey);
 

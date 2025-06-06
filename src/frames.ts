@@ -28,50 +28,50 @@ export const map = new Frame(
   {
     "2:2": {
       type: FrameActionType.Prompt,
-      data: "a small building",
+      data: ["a small building"],
     },
     "7:2": {
       type: FrameActionType.Prompt,
-      data: "a large building",
+      data: ["a large building"],
     },
     "8:2": {
       type: FrameActionType.Prompt,
-      data: "a large building",
+      data: ["a large building"],
     },
     "16:2": {
       type: FrameActionType.Prompt,
-      data: "a small building",
+      data: ["a small building"],
     },
     //
     "14:10": {
       type: FrameActionType.Prompt,
-      data: "a small building",
+      data: ["a small building"],
     },
     "17:10": {
       type: FrameActionType.Prompt,
-      data: "a small building",
+      data: ["a small building"],
     },
     //
     "3:12": {
       type: FrameActionType.Prompt,
-      data: "a large building",
+      data: ["a large building", "closed"],
     },
     "4:12": {
       type: FrameActionType.Prompt,
-      data: "a large building",
+      data: ["a large building", "closed"],
     },
     "8:12": {
       type: FrameActionType.Prompt,
-      data: "a small building",
+      data: ["a small building\nclosed"],
     },
     //
     "15:14": {
       type: FrameActionType.Prompt,
-      data: "a large building",
+      data: ["a large building"],
     },
     "16:14": {
       type: FrameActionType.Prompt,
-      data: "a large building",
+      data: ["a large building"],
     },
     //
     "3:16": {
@@ -101,23 +101,23 @@ export const home = new Frame(
   {
     "2:4": {
       type: FrameActionType.Prompt,
-      data: "desk",
+      data: ["desk"],
     },
     "4:2": {
       type: FrameActionType.Prompt,
-      data: "guitar",
+      data: ["guitar"],
     },
     "6:2": {
       type: FrameActionType.Prompt,
-      data: "tinkering",
+      data: ["tinkering"],
     },
     "7:5": {
       type: FrameActionType.Prompt,
-      data: "shelf",
+      data: ["shelf"],
     },
     "7:6": {
       type: FrameActionType.Prompt,
-      data: "moto",
+      data: ["moto"],
     },
     "4:8": {
       type: FrameActionType.Load,

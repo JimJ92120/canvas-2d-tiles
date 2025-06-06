@@ -14,7 +14,7 @@ export function loadKeyboardEvents(engine: Engine): void {
 
       case "Escape":
       case " ":
-        engine.hidePrompt();
+        engine.nextOrHidePrompt();
         break;
 
       default:
