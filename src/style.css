@@ -11,29 +11,20 @@ body > * {
 }
 
 #app {
+  position: relative;
   display: flex;
-  flex-flow: column;
   margin-left: auto;
   margin-right: auto;
-
-  position: relative;
-  max-width: 500px;
 }
 
 .scene {
   background-color: lightblue;
-  image-rendering: pixelated;
-}
-.debug-scene {
-  display: none;
-  background-color: lightgrey;
-  border: 1px solid red;
-  image-rendering: pixelated;
 }
 
 .prompt {
   background-color: white;
   color: black;
+  text-align: left;
 
   display: none;
   position: absolute;
@@ -43,23 +34,11 @@ body > * {
   white-space: pre-wrap;
 }
 
-.prompt--active,
-.prompt--active-debug {
+.prompt--active {
   display: block;
 }
 .prompt * {
   font-size: 1rem;
   margin: 0;
   padding: 0;
-}
-
-/* debug */
-.app--debug {
-  .debug-scene {
-    display: block;
-  }
-
-  .prompt--active {
-    bottom: 50%;
-  }
 }

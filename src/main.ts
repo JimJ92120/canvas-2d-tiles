@@ -2,63 +2,64 @@ import "./style.css";
 
 import App from "./App";
 
-import Engine from "./engine";
-
-import { getScreenSize } from "./helpers";
+import Engine, {
+  EngineOptions,
+  FrameRecord,
+  ObjectRecord,
+  PromptOptions,
+  RendererOptions,
+} from "./engine";
 
 import { loadKeyboardEvents } from "./components/events";
-import TypePrompt from "./animations/TypePrompt";
-import { EngineOptions } from "./options";
+import { home, main } from "./components/frames";
+import { player } from "./components/objects";
 
-const DEBUG: boolean = true;
-const MAX_SCENE_SIZE: number = 500;
-const MINIMUM_FRAME_SIZE: [number, number] = [10, 10];
+const SCENE_DIMENSION: number = 500;
+const SCENE_SIZE: number = 10;
 
 document.addEventListener("DOMContentLoaded", async () => {
-  const screenSize = getScreenSize(MAX_SCENE_SIZE);
-
   const app = new App(document.querySelector("#app")!);
   app.render();
-  app.$container.style.maxWidth = `${screenSize}px`;
+  app.$container.style.maxWidth = `${SCENE_DIMENSION}px`;
 
-  if (DEBUG) {
-    app.$container.classList.add("app--debug");
-  }
-
-  let options = EngineOptions(
-    app.$container.querySelector(".scene")!,
-    app.$container.querySelector(".debug-scene")!,
-    app.$container.querySelector(".prompt")!,
-    screenSize,
-    MINIMUM_FRAME_SIZE,
-    true
-  );
-
-  //
-  const typePrompt = new TypePrompt(options.prompt.$prompt);
-  options.prompt.animationRecord = {
-    onShow: (_, content) =>
-      new Promise(async (resolve) => {
-        await typePrompt.type(content, 50);
-
-        resolve();
-      }),
-    onHide: () =>
-      new Promise((resolve) => {
-        typePrompt.clear();
-
-        resolve();
-      }),
+  const rendererOptions: RendererOptions = {
+    $scene: app.$container.querySelector(".scene")!,
   };
-
-  //
+  const promptOptions: PromptOptions = {
+    $prompt: app.$container.querySelector(".prompt")!,
+    activeClassName: "prompt--active",
+  };
+  const frameRecord: FrameRecord = {
+    main,
+    home,
+  };
+  const objectRecord: ObjectRecord = {
+    player,
+  };
+  const options: EngineOptions = {
+    renderer: {
+      dimension: [SCENE_DIMENSION, SCENE_DIMENSION],
+      size: [SCENE_SIZE, SCENE_SIZE],
+    },
+    prompt: {
+      speed: 100,
+    },
+  };
   const engine = new Engine(
-    options.player,
-    options.frameRecord,
-    options.renderer,
-    options.prompt
+    rendererOptions,
+    promptOptions,
+    frameRecord,
+    objectRecord,
+    options
   );
 
-  await engine.init();
+  await engine.init("main", "player");
+  engine.render("player");
+
+  //
   loadKeyboardEvents(engine);
+
+  setTimeout(() => {
+    engine.typeToPrompt(["Hello World", "Welcome"]);
+  }, 1000);
 });

@@ -8,9 +8,7 @@ export default class App {
   render() {
     this.$container.innerHTML = `
       <canvas class="scene"></canvas>
-      <div class="prompt">Hello world</div>
-
-      <canvas class="debug-scene"></canvas>
+      <div class="prompt">Hello world Prompt</div>
   `;
   }
 }
