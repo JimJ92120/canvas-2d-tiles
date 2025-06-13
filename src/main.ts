@@ -10,7 +10,7 @@ import Engine, {
   RendererOptions,
 } from "./engine";
 
-import { loadKeyboardEvents } from "./components/events";
+import { LoadButtonEvents, loadKeyboardEvents } from "./components/events";
 import { home, main } from "./components/frames";
 import { player } from "./components/objects";
 
@@ -58,6 +58,12 @@ document.addEventListener("DOMContentLoaded", async () => {
 
   //
   loadKeyboardEvents(engine);
+  LoadButtonEvents(
+    engine,
+    app.$container.querySelectorAll(".direction-button")!,
+    app.$container.querySelector('.select-button[data-select="a"]')!,
+    app.$container.querySelector('.select-button[data-select="b"]')!
+  );
 
   setTimeout(() => {
     engine.typeToPrompt(["Hello World", "Welcome"]);

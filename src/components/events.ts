@@ -25,3 +25,28 @@ export function loadKeyboardEvents(engine: Engine): void {
     }
   });
 }
+
+export function LoadButtonEvents(
+  engine: Engine,
+  $directionButtonList: NodeListOf<HTMLButtonElement>,
+  $aButton: HTMLButtonElement,
+  $bButton: HTMLButtonElement
+) {
+  Object.keys($directionButtonList).map((buttonKey: any) => {
+    const $button = $directionButtonList[buttonKey];
+    const directionKey = $button.getAttribute("data-direction") ?? "";
+
+    $button.addEventListener("click", async () => {
+      await engine.move("player", directionKey);
+      engine.render("player");
+    });
+  });
+
+  $aButton.addEventListener("click", async () => {
+    await engine.nextOrHidePrompt();
+  });
+
+  $bButton.addEventListener("click", async () => {
+    //
+  });
+}
