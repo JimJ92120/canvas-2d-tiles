@@ -29,7 +29,7 @@ export default class Prompt {
 
   async nextOrHide(): Promise<void> {
     if (!this.isShown) {
-      throw new Error("prompt not shown");
+      return;
     }
 
     if (!this.#currentContent[this.#currentContentIndex + 1]) {

@@ -111,39 +111,6 @@ export default class Engine {
     this.render();
   }
 
-  focusPlayer(): void {
-    const { position } = this.#player;
-
-    let focusedPosition: [number, number] = [...position];
-
-    const { size: rendererSize } = this.#renderer;
-    const { size: sceneSize } = this.currentScene!;
-
-    const treshold: [number, number] = [
-      0 === rendererSize[0] % 2
-        ? Math.floor(rendererSize[0] / 2) - 1
-        : Math.floor(rendererSize[0] / 2),
-      0 === rendererSize[1] % 2
-        ? Math.floor(rendererSize[1] / 2) - 1
-        : Math.floor(rendererSize[1] / 2),
-    ];
-
-    focusedPosition = [
-      treshold[0] >= position[0] ? 0 : position[0] - treshold[0],
-      treshold[1] >= position[1] ? 0 : position[1] - treshold[1],
-    ];
-
-    if (focusedPosition[0] >= sceneSize[0] - rendererSize[0]) {
-      focusedPosition[0] = sceneSize[0] - rendererSize[0];
-    }
-
-    if (focusedPosition[1] >= sceneSize[1] - rendererSize[1]) {
-      focusedPosition[1] = sceneSize[1] - rendererSize[1];
-    }
-
-    this.#focusedPosition = focusedPosition;
-  }
-
   async movePlayer(direction: Direction): Promise<boolean> {
     if (this.#prompt.isTyping) {
       this.#prompt.hide();
@@ -197,8 +164,40 @@ export default class Engine {
     this.#renderer.clear();
 
     this.#renderer.renderScene(this.currentScene, this.#focusedPosition);
-
     this.#renderer.renderPlayer(this.#player, this.#focusedPosition);
+  }
+
+  private focusPlayer(): void {
+    const { position } = this.#player;
+
+    let focusedPosition: [number, number] = [...position];
+
+    const { size: rendererSize } = this.#renderer;
+    const { size: sceneSize } = this.currentScene!;
+
+    const treshold: [number, number] = [
+      0 === rendererSize[0] % 2
+        ? Math.floor(rendererSize[0] / 2) - 1
+        : Math.floor(rendererSize[0] / 2),
+      0 === rendererSize[1] % 2
+        ? Math.floor(rendererSize[1] / 2) - 1
+        : Math.floor(rendererSize[1] / 2),
+    ];
+
+    focusedPosition = [
+      treshold[0] >= position[0] ? 0 : position[0] - treshold[0],
+      treshold[1] >= position[1] ? 0 : position[1] - treshold[1],
+    ];
+
+    if (focusedPosition[0] >= sceneSize[0] - rendererSize[0]) {
+      focusedPosition[0] = sceneSize[0] - rendererSize[0];
+    }
+
+    if (focusedPosition[1] >= sceneSize[1] - rendererSize[1]) {
+      focusedPosition[1] = sceneSize[1] - rendererSize[1];
+    }
+
+    this.#focusedPosition = focusedPosition;
   }
 
   private canPlayerMove(nextPosition: Player["position"]): boolean {
