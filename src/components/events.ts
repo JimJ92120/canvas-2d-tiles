@@ -51,8 +51,12 @@ export function loadPlayerMoveEvents(
   });
 }
 
-export function loadPromptEvents(engine: Engine): void {
-  document.addEventListener("keyup", (event: KeyboardEvent) => {
+export function loadPromptEvents(
+  engine: Engine,
+  $aButton: HTMLButtonElement,
+  $bButton: HTMLButtonElement
+): void {
+  document.addEventListener("keyup", async (event: KeyboardEvent) => {
     switch (event.key) {
       case "Escape":
         engine.hidePrompt();
@@ -60,8 +64,16 @@ export function loadPromptEvents(engine: Engine): void {
 
       // space
       case " ":
-        engine.nextOrHidePrompt();
+        await engine.nextOrHidePrompt();
         break;
     }
+  });
+
+  $aButton.addEventListener("click", async () => {
+    await engine.nextOrHidePrompt();
+  });
+
+  $bButton.addEventListener("click", async () => {
+    engine.hidePrompt();
   });
 }

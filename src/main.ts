@@ -31,5 +31,9 @@ document.addEventListener("DOMContentLoaded", async () => {
     engine,
     app.$container.querySelectorAll(".direction-button")!
   );
-  loadPromptEvents(engine);
+  loadPromptEvents(
+    engine,
+    app.$container.querySelector('.select-button[data-select="a"]')!,
+    app.$container.querySelector('.select-button[data-select="b"]')!
+  );
 });
