@@ -37,7 +37,7 @@ export default class Engine {
     return Boolean(this.#animationFrame);
   }
 
-  private get currentScene(): Scene {
+  get #currentScene(): Scene {
     return this.#sceneRecord[this.#currentSceneName];
   }
 
@@ -104,7 +104,7 @@ export default class Engine {
 
       this.#lastMapPosition = null;
     } else {
-      this.#player.position = [...this.currentScene.initialPlayerPosition];
+      this.#player.position = [...this.#currentScene.initialPlayerPosition];
     }
 
     this.focusPlayer();
@@ -142,7 +142,7 @@ export default class Engine {
     this.#player.direction = direction;
     this.#player.animate();
 
-    const sceneEvent = this.currentScene.getEvent(nextPosition);
+    const sceneEvent = this.#currentScene.getEvent(nextPosition);
 
     if (!this.canPlayerMove(nextPosition) && !sceneEvent) {
       return false;
@@ -163,7 +163,7 @@ export default class Engine {
   private render(): void {
     this.#renderer.clear();
 
-    this.#renderer.renderScene(this.currentScene, this.#focusedPosition);
+    this.#renderer.renderScene(this.#currentScene, this.#focusedPosition);
     this.#renderer.renderPlayer(this.#player, this.#focusedPosition);
   }
 
@@ -173,7 +173,7 @@ export default class Engine {
     let focusedPosition: [number, number] = [...position];
 
     const { size: rendererSize } = this.#renderer;
-    const { size: sceneSize } = this.currentScene!;
+    const { size: sceneSize } = this.#currentScene!;
 
     const treshold: [number, number] = [
       0 === rendererSize[0] % 2
@@ -203,14 +203,14 @@ export default class Engine {
   private canPlayerMove(nextPosition: Player["position"]): boolean {
     return (
       this.isPositionValid(nextPosition) &&
-      0 === this.currentScene.data[nextPosition[1]][nextPosition[0]]
+      0 === this.#currentScene.data[nextPosition[1]][nextPosition[0]]
     );
   }
 
   private isPositionValid(position: [number, number]): boolean {
     return (
-      this.currentScene.size[0] > position[0] &&
-      this.currentScene.size[1] > position[1] &&
+      this.#currentScene.size[0] > position[0] &&
+      this.#currentScene.size[1] > position[1] &&
       0 <= position[0] &&
       0 <= position[1]
     );

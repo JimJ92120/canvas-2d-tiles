@@ -22,7 +22,7 @@ export default class Renderer {
     this.backgroundColor = backgroundColor;
   }
 
-  private get tileDimension(): [number, number] {
+  get #tileDimension(): [number, number] {
     return [this.dimension[0] / this.size[0], this.dimension[1] / this.size[1]];
   }
 
@@ -60,7 +60,6 @@ export default class Renderer {
 
   private renderPlayerSprite(player: Player): void {
     const { sprite, position, spritePosition } = player;
-    const { tileDimension } = this;
 
     if (!sprite || !spritePosition) {
       return;
@@ -75,22 +74,21 @@ export default class Renderer {
         sprite.height / 4,
         0,
         0,
-        tileDimension[0],
-        tileDimension[1]
+        this.#tileDimension[0],
+        this.#tileDimension[1]
       );
     });
   }
 
   private renderPlayerTile(player: Player): void {
     const { position } = player;
-    const { tileDimension } = this;
 
     this.#context.fillStyle = "red";
     this.renderRawTile(position);
 
     const translatedPosition: [number, number] = [
-      position[0] * tileDimension[0] + tileDimension[0] / 2,
-      position[1] * tileDimension[1] + tileDimension[1] / 2,
+      position[0] * this.#tileDimension[0] + this.#tileDimension[0] / 2,
+      position[1] * this.#tileDimension[1] + this.#tileDimension[1] / 2,
     ];
 
     let angle = 0; // Direction.Down
@@ -116,21 +114,19 @@ export default class Renderer {
       this.#context.moveTo(translatedPosition[0], translatedPosition[1]);
       this.#context.lineTo(
         translatedPosition[0],
-        translatedPosition[1] + tileDimension[1] / 2
+        translatedPosition[1] + this.#tileDimension[1] / 2
       );
       this.#context.stroke();
     });
   }
 
   private renderSceneBackground(scene: Scene): void {
-    const { tileDimension } = this;
-
     this.#context.drawImage(
       scene.backgroundImage,
       0,
       0,
-      scene.size[0] * tileDimension[0],
-      scene.size[1] * tileDimension[1]
+      scene.size[0] * this.#tileDimension[0],
+      scene.size[1] * this.#tileDimension[1]
     );
   }
 
@@ -151,13 +147,11 @@ export default class Renderer {
   }
 
   private renderRawTile(position: [number, number]): void {
-    const { tileDimension } = this;
-
     this.#context.fillRect(
-      position[0] * tileDimension[0],
-      position[1] * tileDimension[1],
-      tileDimension[0],
-      tileDimension[1]
+      position[0] * this.#tileDimension[0],
+      position[1] * this.#tileDimension[1],
+      this.#tileDimension[0],
+      this.#tileDimension[1]
     );
   }
 
@@ -165,12 +159,10 @@ export default class Renderer {
     offset: [number, number],
     renderCallback: CallableFunction
   ): void {
-    const { tileDimension } = this;
-
     this.#context.save();
     this.#context.translate(
-      -offset[0] * tileDimension[0],
-      -offset[1] * tileDimension[1]
+      -offset[0] * this.#tileDimension[0],
+      -offset[1] * this.#tileDimension[1]
     );
 
     renderCallback();
