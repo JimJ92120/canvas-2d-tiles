@@ -20,7 +20,7 @@ document.addEventListener("DOMContentLoaded", async () => {
       [10, 10],
       "grey"
     ),
-    new Prompt(app.$container.querySelector(".prompt")!, "prompt--active", 100),
+    new Prompt(app.$container.querySelector(".prompt")!, 100),
     player,
     sceneRecord
   );

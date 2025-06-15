@@ -38,8 +38,7 @@ body > * {
   width: calc(100% - 2rem);
   white-space: pre-wrap;
 }
-
-.prompt--active {
+.prompt[open] {
   display: block;
 }
 .prompt * {

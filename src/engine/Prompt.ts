@@ -1,24 +1,18 @@
 export default class Prompt {
-  #$container: HTMLElement;
-  #activeClassName: string;
+  #$dialog: HTMLDialogElement;
   #typingSpeed: number;
 
   #typingInterval: any;
   #currentContent: string[] = [];
   #currentContentIndex: number = 0;
 
-  constructor(
-    $container: HTMLElement,
-    activeClassName: string,
-    typingSpeed: number
-  ) {
-    this.#$container = $container;
-    this.#activeClassName = activeClassName;
+  constructor($dialog: HTMLDialogElement, typingSpeed: number) {
+    this.#$dialog = $dialog;
     this.#typingSpeed = typingSpeed;
   }
 
   get isShown(): boolean {
-    return this.#$container.classList.contains(this.#activeClassName);
+    return Boolean(this.#$dialog.open);
   }
 
   get isTyping(): boolean {
@@ -53,7 +47,7 @@ export default class Prompt {
     this.clear();
     this.reset();
 
-    this.#$container.classList.remove(this.#activeClassName);
+    this.#$dialog.close();
   }
 
   private async typeText(text: string): Promise<void> {
@@ -64,16 +58,16 @@ export default class Prompt {
     let rowIndex = 0;
     let charIndex = 0;
 
-    this.#$container.classList.add(this.#activeClassName);
+    this.#$dialog.show();
 
     return new Promise((resolve) => {
       this.#typingInterval = setInterval(() => {
         try {
           if (0 === charIndex && 0 !== rowIndex) {
-            this.#$container.textContent += "\n";
+            this.#$dialog.textContent += "\n";
           }
 
-          this.#$container.textContent += split[rowIndex][charIndex];
+          this.#$dialog.textContent += split[rowIndex][charIndex];
 
           if (split[rowIndex].length <= charIndex + 1) {
             ++rowIndex;
@@ -98,7 +92,7 @@ export default class Prompt {
   }
 
   private clear(): void {
-    this.#$container.innerHTML = "";
+    this.#$dialog.innerHTML = "";
 
     this.clearTypingInterval();
   }

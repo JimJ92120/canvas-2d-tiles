@@ -10,7 +10,7 @@ export default class App {
       <div class="container">
         <canvas class="scene"></canvas>
 
-        <div class="prompt">Hello world</div>
+        <dialog class="prompt">Hello Prompt</dialog>
       </div>
 
       <div class="controls">
