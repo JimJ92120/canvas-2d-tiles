@@ -25,73 +25,73 @@ export type SpriteData = {
 export default class Player {
   position: [number, number];
   direction: Direction;
-  readonly spriteUrl: string | null;
-  readonly spriteData: SpriteData | null;
+  #spriteData: SpriteData | null;
   sprite: HTMLImageElement;
   isMoving: boolean = false;
-  private animationIndex: number = -1;
+  #animationIndex: number = -1;
 
   constructor(
     position: Player["position"],
     direction: Player["direction"],
-    spriteData: Player["spriteData"]
+    spriteData: SpriteData | null
   ) {
     this.position = position;
     this.direction = direction;
-    this.spriteData = spriteData;
+    this.#spriteData = spriteData;
   }
 
   async init(): Promise<void> {
-    if (!this.spriteData || "" === this.spriteData.imageUrl) {
+    if (!this.#spriteData || "" === this.#spriteData.imageUrl) {
       return;
     }
 
-    this.sprite = await this.loadImage(this.spriteData.imageUrl);
+    this.sprite = await this.loadImage(this.#spriteData.imageUrl);
   }
 
   get spritePosition(): [number, number] | null {
-    if (!this.spriteData) {
+    if (!this.#spriteData) {
       return null;
     }
 
     if (
       this.isMoving &&
-      0 <= this.animationIndex &&
-      this.spriteData.animation[this.direction]
+      0 <= this.#animationIndex &&
+      this.#spriteData.animation[this.direction]
     ) {
       return (
-        this.spriteData.animation[this.direction]![this.animationIndex!] ?? null
+        this.#spriteData.animation[this.direction]![this.#animationIndex!] ??
+        null
       );
     } else {
-      return this.spriteData.direction[this.direction] ?? null;
+      return this.#spriteData.direction[this.direction] ?? null;
     }
   }
 
   animate(): void {
-    if (!this.spriteData || !this.spriteData.animation[this.direction]) {
+    if (!this.#spriteData || !this.#spriteData.animation[this.direction]) {
       return;
     }
 
-    const positionList = this.spriteData.animation[this.direction]!;
+    const positionList = this.#spriteData.animation[this.direction]!;
 
     if (!positionList.length) {
       return;
     }
 
     this.isMoving = true;
-    this.animationIndex = 0;
+    this.#animationIndex = 0;
 
     const interval = setInterval(() => {
-      ++this.animationIndex!;
+      ++this.#animationIndex!;
 
-      if (!positionList[this.animationIndex!]) {
-        this.animationIndex = -1;
+      if (!positionList[this.#animationIndex!]) {
+        this.#animationIndex = -1;
         this.isMoving = false;
         clearInterval(interval);
 
         return;
       }
-    }, this.spriteData.animationDuration / positionList.length);
+    }, this.#spriteData.animationDuration / positionList.length);
   }
 
   private async loadImage(imageUrl: string): Promise<HTMLImageElement> {

@@ -64,6 +64,7 @@ export function loadPromptEvents(
 
       // space
       case " ":
+      case "Enter":
         await engine.nextOrHidePrompt();
         break;
     }

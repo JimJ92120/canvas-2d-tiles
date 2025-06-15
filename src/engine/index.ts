@@ -11,59 +11,59 @@ export type SceneRecord = {
 export { Direction };
 
 export default class Engine {
-  private renderer: Renderer;
-  private player: Player;
-  private sceneRecord: SceneRecord;
-  private prompt: Prompt;
+  #renderer: Renderer;
+  #player: Player;
+  #sceneRecord: SceneRecord;
+  #prompt: Prompt;
 
-  private animationFrame: number;
-  private currentSceneName: string;
-  private focusedPosition: [number, number] = [0, 0];
-  private lastMapPosition: [number, number] | null = null;
+  #animationFrame: number;
+  #currentSceneName: string;
+  #focusedPosition: [number, number] = [0, 0];
+  #lastMapPosition: [number, number] | null = null;
 
   constructor(
-    renderer: Engine["renderer"],
-    prompt: Engine["prompt"],
-    player: Engine["player"],
-    sceneRecord: Engine["sceneRecord"]
+    renderer: Renderer,
+    prompt: Prompt,
+    player: Player,
+    sceneRecord: SceneRecord
   ) {
-    this.renderer = renderer;
-    this.prompt = prompt;
-    this.player = player;
-    this.sceneRecord = sceneRecord;
+    this.#renderer = renderer;
+    this.#prompt = prompt;
+    this.#player = player;
+    this.#sceneRecord = sceneRecord;
   }
 
   get isRunning(): boolean {
-    return Boolean(this.animationFrame);
+    return Boolean(this.#animationFrame);
   }
 
   private get currentScene(): Scene {
-    return this.sceneRecord[this.currentSceneName];
+    return this.#sceneRecord[this.#currentSceneName];
   }
 
   async init(welcomeMessage: string[] = []): Promise<void> {
-    this.renderer.init();
+    this.#renderer.init();
 
     await Promise.all(
-      Object.keys(this.sceneRecord).map((sceneName) => {
-        return this.sceneRecord[sceneName].init();
+      Object.keys(this.#sceneRecord).map((sceneName) => {
+        return this.#sceneRecord[sceneName].init();
       })
     );
-    await this.player.init();
+    await this.#player.init();
 
     this.loadScene("map");
 
     if (welcomeMessage.length) {
-      this.prompt.type(welcomeMessage);
+      this.#prompt.type(welcomeMessage);
     }
   }
 
   async nextOrHidePrompt(): Promise<void> {
-    return this.prompt.nextOrHide();
+    return this.#prompt.nextOrHide();
   }
 
   hidePrompt(): void {
-    return this.prompt.hide();
+    return this.#prompt.hide();
   }
 
   run(): void {
@@ -75,7 +75,7 @@ export default class Engine {
     const renderCallback = () => {
       this.render();
 
-      this.animationFrame = requestAnimationFrame(renderCallback);
+      this.#animationFrame = requestAnimationFrame(renderCallback);
     };
 
     renderCallback();
@@ -84,27 +84,27 @@ export default class Engine {
   stop(): void {
     console.log("stopping engine");
 
-    cancelAnimationFrame(this.animationFrame);
-    this.animationFrame = 0;
+    cancelAnimationFrame(this.#animationFrame);
+    this.#animationFrame = 0;
   }
 
   loadScene(sceneName: string): void {
-    if (!this.sceneRecord[sceneName]) {
+    if (!this.#sceneRecord[sceneName]) {
       throw new Error(`scene "${sceneName}" doesn't exist`);
     }
 
-    if ("map" === this.currentSceneName && "map" !== sceneName) {
-      this.lastMapPosition = [...this.player.position];
+    if ("map" === this.#currentSceneName && "map" !== sceneName) {
+      this.#lastMapPosition = [...this.#player.position];
     }
 
-    this.currentSceneName = sceneName;
+    this.#currentSceneName = sceneName;
 
-    if ("map" === sceneName && this.lastMapPosition) {
-      this.player.position = [...this.lastMapPosition];
+    if ("map" === sceneName && this.#lastMapPosition) {
+      this.#player.position = [...this.#lastMapPosition];
 
-      this.lastMapPosition = null;
+      this.#lastMapPosition = null;
     } else {
-      this.player.position = [...this.currentScene.initialPlayerPosition];
+      this.#player.position = [...this.currentScene.initialPlayerPosition];
     }
 
     this.focusPlayer();
@@ -112,11 +112,11 @@ export default class Engine {
   }
 
   focusPlayer(): void {
-    const { position } = this.player;
+    const { position } = this.#player;
 
     let focusedPosition: [number, number] = [...position];
 
-    const { size: rendererSize } = this.renderer;
+    const { size: rendererSize } = this.#renderer;
     const { size: sceneSize } = this.currentScene!;
 
     const treshold: [number, number] = [
@@ -141,19 +141,19 @@ export default class Engine {
       focusedPosition[1] = sceneSize[1] - rendererSize[1];
     }
 
-    this.focusedPosition = focusedPosition;
+    this.#focusedPosition = focusedPosition;
   }
 
   async movePlayer(direction: Direction): Promise<boolean> {
-    if (this.prompt.isTyping) {
-      this.prompt.hide();
+    if (this.#prompt.isTyping) {
+      this.#prompt.hide();
     }
 
-    if (this.player.isMoving) {
+    if (this.#player.isMoving) {
       return false;
     }
 
-    let nextPosition: Player["position"] = [...this.player.position];
+    let nextPosition: Player["position"] = [...this.#player.position];
     switch (direction) {
       case Direction.Up:
         --nextPosition[1];
@@ -172,8 +172,8 @@ export default class Engine {
         break;
     }
 
-    this.player.direction = direction;
-    this.player.animate();
+    this.#player.direction = direction;
+    this.#player.animate();
 
     const sceneEvent = this.currentScene.getEvent(nextPosition);
 
@@ -187,19 +187,18 @@ export default class Engine {
       return true;
     }
 
-    this.player.position = nextPosition;
+    this.#player.position = nextPosition;
     this.focusPlayer();
 
     return true;
   }
 
-  //
   private render(): void {
-    this.renderer.clear();
+    this.#renderer.clear();
 
-    this.renderer.renderScene(this.currentScene, this.focusedPosition);
+    this.#renderer.renderScene(this.currentScene, this.#focusedPosition);
 
-    this.renderer.renderPlayer(this.player, this.focusedPosition);
+    this.#renderer.renderPlayer(this.#player, this.#focusedPosition);
   }
 
   private canPlayerMove(nextPosition: Player["position"]): boolean {
@@ -224,7 +223,7 @@ export default class Engine {
         return this.loadScene(sceneEvent.data);
 
       case SceneEventType.Prompt:
-        return this.prompt.type(sceneEvent.data);
+        return this.#prompt.type(sceneEvent.data);
     }
   }
 }

@@ -2,21 +2,21 @@ import Player, { Direction } from "./components/Player";
 import Scene from "./components/Scene";
 
 export default class Renderer {
-  private $canvas: HTMLCanvasElement;
-  private context: CanvasRenderingContext2D;
+  #$canvas: HTMLCanvasElement;
+  #context: CanvasRenderingContext2D;
 
   readonly dimension: [number, number];
   readonly size: [number, number];
   readonly backgroundColor: string;
 
   constructor(
-    $canvas: Renderer["$canvas"],
+    $canvas: HTMLCanvasElement,
     dimension: Renderer["dimension"],
     size: Renderer["size"],
     backgroundColor: Renderer["backgroundColor"]
   ) {
-    this.$canvas = $canvas;
-    this.context = this.$canvas.getContext("2d")!;
+    this.#$canvas = $canvas;
+    this.#context = this.#$canvas.getContext("2d")!;
     this.dimension = dimension;
     this.size = size;
     this.backgroundColor = backgroundColor;
@@ -27,15 +27,15 @@ export default class Renderer {
   }
 
   init(): void {
-    this.$canvas.width = this.dimension[0];
-    this.$canvas.height = this.dimension[1];
-    this.$canvas.style.backgroundColor = this.backgroundColor;
+    this.#$canvas.width = this.dimension[0];
+    this.#$canvas.height = this.dimension[1];
+    this.#$canvas.style.backgroundColor = this.backgroundColor;
 
     this.clear();
   }
 
   clear(): void {
-    this.context.clearRect(0, 0, this.dimension[0], this.dimension[1]);
+    this.#context.clearRect(0, 0, this.dimension[0], this.dimension[1]);
   }
 
   renderScene(scene: Scene, focusedPosition: [number, number]): void {
@@ -67,7 +67,7 @@ export default class Renderer {
     }
 
     this.translate([-position[0], -position[1]], () => {
-      this.context.drawImage(
+      this.#context.drawImage(
         sprite,
         (spritePosition[0] * sprite.width) / 4,
         (spritePosition[1] * sprite.height) / 4,
@@ -85,7 +85,7 @@ export default class Renderer {
     const { position } = player;
     const { tileDimension } = this;
 
-    this.context.fillStyle = "red";
+    this.#context.fillStyle = "red";
     this.renderRawTile(position);
 
     const translatedPosition: [number, number] = [
@@ -108,24 +108,24 @@ export default class Renderer {
         break;
     }
 
-    this.context.strokeStyle = "black";
-    this.context.lineWidth = 5;
+    this.#context.strokeStyle = "black";
+    this.#context.lineWidth = 5;
 
     this.rotate(angle, translatedPosition, () => {
-      this.context.beginPath();
-      this.context.moveTo(translatedPosition[0], translatedPosition[1]);
-      this.context.lineTo(
+      this.#context.beginPath();
+      this.#context.moveTo(translatedPosition[0], translatedPosition[1]);
+      this.#context.lineTo(
         translatedPosition[0],
         translatedPosition[1] + tileDimension[1] / 2
       );
-      this.context.stroke();
+      this.#context.stroke();
     });
   }
 
   private renderSceneBackground(scene: Scene): void {
     const { tileDimension } = this;
 
-    this.context.drawImage(
+    this.#context.drawImage(
       scene.backgroundImage,
       0,
       0,
@@ -143,7 +143,7 @@ export default class Renderer {
 
         const sceneEvent = scene.getEvent([columnIndex, rowIndex]);
 
-        this.context.fillStyle = sceneEvent ? "green" : "blue";
+        this.#context.fillStyle = sceneEvent ? "green" : "blue";
 
         this.renderRawTile([columnIndex, rowIndex]);
       });
@@ -153,7 +153,7 @@ export default class Renderer {
   private renderRawTile(position: [number, number]): void {
     const { tileDimension } = this;
 
-    this.context.fillRect(
+    this.#context.fillRect(
       position[0] * tileDimension[0],
       position[1] * tileDimension[1],
       tileDimension[0],
@@ -167,15 +167,15 @@ export default class Renderer {
   ): void {
     const { tileDimension } = this;
 
-    this.context.save();
-    this.context.translate(
+    this.#context.save();
+    this.#context.translate(
       -offset[0] * tileDimension[0],
       -offset[1] * tileDimension[1]
     );
 
     renderCallback();
 
-    this.context.restore();
+    this.#context.restore();
   }
 
   private rotate(
@@ -183,14 +183,14 @@ export default class Renderer {
     origin: [number, number],
     renderCallback: CallableFunction
   ): void {
-    this.context.save();
+    this.#context.save();
 
-    this.context.translate(origin[0], origin[1]);
-    this.context.rotate((angle * Math.PI) / 180);
-    this.context.translate(-origin[0], -origin[1]);
+    this.#context.translate(origin[0], origin[1]);
+    this.#context.rotate((angle * Math.PI) / 180);
+    this.#context.translate(-origin[0], -origin[1]);
 
     renderCallback();
 
-    this.context.restore();
+    this.#context.restore();
   }
 }
