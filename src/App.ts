@@ -27,6 +27,6 @@ export default class App {
           <button class="select-button" data-select="b">B</button>
         </div>
       </div>
-  `;
+    `;
   }
 }

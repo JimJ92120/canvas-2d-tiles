@@ -1,14 +1,20 @@
 export default class Prompt {
   private $container: HTMLElement;
   readonly activeClassName: string;
+  readonly typingSpeed: number;
+
   private typingInterval: any;
+  private currentContent: string[] = [];
+  private currentContentIndex: number = 0;
 
   constructor(
     $container: Prompt["$container"],
-    activeClassName: Prompt["activeClassName"]
+    activeClassName: Prompt["activeClassName"],
+    typingSpeed: Prompt["typingSpeed"]
   ) {
     this.$container = $container;
     this.activeClassName = activeClassName;
+    this.typingSpeed = typingSpeed;
   }
 
   get isShown(): boolean {
@@ -16,10 +22,41 @@ export default class Prompt {
   }
 
   get isTyping(): boolean {
-    return Boolean(this.typingInterval);
+    return Boolean(this.typingInterval) || 0 < this.currentContent.length;
   }
 
-  async type(text: string, speed: number): Promise<void> {
+  async type(content: string[]): Promise<void> {
+    this.reset();
+
+    this.currentContent = content;
+
+    return this.typeText(this.currentContent[this.currentContentIndex]);
+  }
+
+  async nextOrHide(): Promise<void> {
+    if (!this.isShown) {
+      throw new Error("prompt not shown");
+    }
+
+    if (!this.currentContent[this.currentContentIndex + 1]) {
+      this.hide();
+
+      return;
+    }
+
+    ++this.currentContentIndex;
+
+    return this.typeText(this.currentContent[this.currentContentIndex]);
+  }
+
+  hide(): void {
+    this.clear();
+    this.reset();
+
+    this.$container.classList.remove(this.activeClassName);
+  }
+
+  private async typeText(text: string): Promise<void> {
     this.clear();
 
     const split = text.split("\n");
@@ -44,23 +81,25 @@ export default class Prompt {
           } else {
             ++charIndex;
           }
-        } catch (err) {
+        } catch (error) {
           this.clearTypingInterval();
         }
-      }, speed);
+      }, this.typingSpeed);
 
       resolve();
     });
   }
 
-  hide(): void {
-    this.clear();
+  private reset(): void {
+    this.currentContent = [];
+    this.currentContentIndex = 0;
 
-    this.$container.classList.remove(this.activeClassName);
+    this.clear();
   }
 
   private clear(): void {
     this.$container.innerHTML = "";
+
     this.clearTypingInterval();
   }
 

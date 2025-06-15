@@ -1,111 +1,158 @@
+import Player, { Direction } from "./components/Player";
+import Scene from "./components/Scene";
+
 export default class Renderer {
-  private $scene: HTMLCanvasElement;
+  private $canvas: HTMLCanvasElement;
   private context: CanvasRenderingContext2D;
-  private size: [number, number] = [0, 0];
 
-  constructor($scene: Renderer["$scene"]) {
-    this.$scene = $scene;
-    this.context = this.$scene.getContext("2d")!;
+  readonly dimension: [number, number];
+  readonly size: [number, number];
+  readonly backgroundColor: string;
+
+  constructor(
+    $canvas: Renderer["$canvas"],
+    dimension: Renderer["dimension"],
+    size: Renderer["size"],
+    backgroundColor: Renderer["backgroundColor"]
+  ) {
+    this.$canvas = $canvas;
+    this.context = this.$canvas.getContext("2d")!;
+    this.dimension = dimension;
+    this.size = size;
+    this.backgroundColor = backgroundColor;
   }
 
-  get dimension(): [number, number] {
-    return [this.$scene.width, this.$scene.height];
-  }
-
-  get tileDimension(): [number, number] {
+  private get tileDimension(): [number, number] {
     return [this.dimension[0] / this.size[0], this.dimension[1] / this.size[1]];
   }
 
-  resize(dimension: [number, number], size: [number, number]): void {
-    this.$scene.width = dimension[0];
-    this.$scene.height = dimension[1];
-    this.size = size;
+  init(): void {
+    this.$canvas.width = this.dimension[0];
+    this.$canvas.height = this.dimension[1];
+    this.$canvas.style.backgroundColor = this.backgroundColor;
+
+    this.clear();
   }
 
   clear(): void {
     this.context.clearRect(0, 0, this.dimension[0], this.dimension[1]);
   }
 
-  renderSceneBackground(
-    backgroundImage: HTMLImageElement,
-    size: [number, number],
-    offset: [number, number]
+  render(
+    scene: Scene,
+    player: Player,
+    focusedPosition: [number, number]
   ): void {
-    const { tileDimension } = this;
+    this.clear();
 
-    this.context.translate(
-      -offset[0] * this.tileDimension[0],
-      -offset[1] * this.tileDimension[1]
-    );
+    this.translate(focusedPosition, () => {
+      this.renderScene(scene);
 
-    this.context.drawImage(
-      backgroundImage,
-      0,
-      0,
-      size[0] * tileDimension[0],
-      size[1] * tileDimension[1]
-    );
-
-    this.context.setTransform(1, 0, 0, 1, 0, 0);
+      this.context.fillStyle = "red";
+      this.renderPlayer(player);
+    });
   }
 
-  renderObjectSprite(
-    spriteImage: HTMLImageElement,
-    position: [number, number],
-    offset: [number, number]
-  ): void {
-    const { tileDimension } = this;
-
-    this.context.translate(
-      position[0] * this.tileDimension[0],
-      position[1] * this.tileDimension[1]
-    );
-
-    this.context.drawImage(
-      spriteImage,
-      offset[0] * tileDimension[0],
-      offset[1] * tileDimension[1],
-      tileDimension[0],
-      tileDimension[1],
-      0,
-      0,
-      tileDimension[0],
-      tileDimension[1]
-    );
-
-    this.context.setTransform(1, 0, 0, 1, 0, 0);
-  }
-
-  renderRawScene(
-    data: number[][],
-    offset: [number, number],
-    colors: { [key: number]: string }
-  ): void {
-    this.context.translate(
-      -offset[0] * this.tileDimension[0],
-      -offset[1] * this.tileDimension[1]
-    );
-
-    data.map((row, rowIndex) => {
+  private renderScene(scene: Scene): void {
+    scene.data.map((row, rowIndex) => {
       row.map((cellValue, columnIndex) => {
-        if (cellValue && colors[cellValue]) {
-          this.renderRawObject([columnIndex, rowIndex], colors[cellValue]);
+        if (!cellValue) {
+          return;
         }
+
+        const sceneEvent = scene.getEvent([columnIndex, rowIndex]);
+
+        this.context.fillStyle = sceneEvent ? "green" : "blue";
+
+        this.renderRawTile([columnIndex, rowIndex]);
       });
     });
 
-    this.context.setTransform(1, 0, 0, 1, 0, 0);
+    if (scene.backgroundImage) {
+      this.context.drawImage(
+        scene.backgroundImage,
+        0,
+        0,
+        scene.size[0] * this.tileDimension[0],
+        scene.size[1] * this.tileDimension[1]
+      );
+    }
   }
 
-  renderRawObject(position: [number, number], color: string): void {
-    const { tileDimension } = this;
+  private renderPlayer(player: Player): void {
+    this.renderRawTile(player.position);
 
-    this.context.fillStyle = color;
+    const translatedPosition: [number, number] = [
+      player.position[0] * this.tileDimension[0] + this.tileDimension[0] / 2,
+      player.position[1] * this.tileDimension[1] + this.tileDimension[1] / 2,
+    ];
+
+    let angle = 0; // Direction.Down
+    switch (player.direction) {
+      case Direction.Up:
+        angle = 180;
+        break;
+
+      case Direction.Left:
+        angle = 90;
+        break;
+
+      case Direction.Right:
+        angle = 270;
+        break;
+    }
+
+    this.context.strokeStyle = "black";
+    this.context.lineWidth = 5;
+
+    this.rotate(angle, translatedPosition, () => {
+      this.context.beginPath();
+      this.context.moveTo(translatedPosition[0], translatedPosition[1]);
+      this.context.lineTo(
+        translatedPosition[0],
+        translatedPosition[1] + this.tileDimension[1] / 2
+      );
+      this.context.stroke();
+    });
+  }
+
+  private renderRawTile(position: [number, number]): void {
     this.context.fillRect(
-      position[0] * tileDimension[0],
-      position[1] * tileDimension[1],
-      tileDimension[0],
-      tileDimension[1]
+      position[0] * this.tileDimension[0],
+      position[1] * this.tileDimension[1],
+      this.tileDimension[0],
+      this.tileDimension[1]
     );
+  }
+
+  private translate(
+    offset: [number, number],
+    renderCallback: CallableFunction
+  ): void {
+    this.context.save();
+    this.context.translate(
+      -offset[0] * this.tileDimension[0],
+      -offset[1] * this.tileDimension[1]
+    );
+
+    renderCallback();
+
+    this.context.restore();
+  }
+
+  private rotate(
+    angle: number,
+    origin: [number, number],
+    renderCallback: CallableFunction
+  ): void {
+    this.context.save();
+
+    this.context.translate(origin[0], origin[1]);
+    this.context.rotate((angle * Math.PI) / 180);
+    this.context.translate(-origin[0], -origin[1]);
+
+    renderCallback();
+
+    this.context.restore();
   }
 }

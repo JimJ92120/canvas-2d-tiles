@@ -1,71 +1,35 @@
 import "./style.css";
 
 import App from "./App";
+import Engine, { Direction } from "./engine";
+import Renderer from "./engine/Renderer";
+import Player from "./engine/components/Player";
 
-import Engine, {
-  EngineOptions,
-  FrameRecord,
-  ObjectRecord,
-  PromptOptions,
-  RendererOptions,
-} from "./engine";
-
-import { LoadButtonEvents, loadKeyboardEvents } from "./components/events";
-import { home, main } from "./components/frames";
-import { player } from "./components/objects";
-
-const SCENE_DIMENSION: number = 500;
-const SCENE_SIZE: number = 10;
+import sceneRecord from "./components/sceneRecord";
+import { loadPromptEvents, loadPlayerMoveEvents } from "./components/events";
+import Prompt from "./engine/Prompt";
 
 document.addEventListener("DOMContentLoaded", async () => {
   const app = new App(document.querySelector("#app")!);
   app.render();
-  app.$container.style.maxWidth = `${SCENE_DIMENSION}px`;
 
-  const rendererOptions: RendererOptions = {
-    $scene: app.$container.querySelector(".scene")!,
-  };
-  const promptOptions: PromptOptions = {
-    $prompt: app.$container.querySelector(".prompt")!,
-    activeClassName: "prompt--active",
-  };
-  const frameRecord: FrameRecord = {
-    main,
-    home,
-  };
-  const objectRecord: ObjectRecord = {
-    player,
-  };
-  const options: EngineOptions = {
-    renderer: {
-      dimension: [SCENE_DIMENSION, SCENE_DIMENSION],
-      size: [SCENE_SIZE, SCENE_SIZE],
-    },
-    prompt: {
-      speed: 100,
-    },
-  };
   const engine = new Engine(
-    rendererOptions,
-    promptOptions,
-    frameRecord,
-    objectRecord,
-    options
+    new Renderer(
+      app.$container.querySelector(".scene")!,
+      [500, 500],
+      [10, 10],
+      "grey"
+    ),
+    new Prompt(app.$container.querySelector(".prompt")!, "prompt--active", 100),
+    new Player([0, 0], Direction.Down),
+    sceneRecord
   );
+  await engine.init();
+  engine.run();
 
-  await engine.init("main", "player");
-  engine.render("player");
-
-  //
-  loadKeyboardEvents(engine);
-  LoadButtonEvents(
+  loadPlayerMoveEvents(
     engine,
-    app.$container.querySelectorAll(".direction-button")!,
-    app.$container.querySelector('.select-button[data-select="a"]')!,
-    app.$container.querySelector('.select-button[data-select="b"]')!
+    app.$container.querySelectorAll(".direction-button")!
   );
-
-  setTimeout(() => {
-    engine.typeToPrompt(["Hello World", "Welcome"]);
-  }, 1000);
+  loadPromptEvents(engine);
 });

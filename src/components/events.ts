@@ -1,52 +1,67 @@
-import Engine from "../engine";
+import Engine, { Direction } from "../engine";
 
-export function loadKeyboardEvents(engine: Engine): void {
-  document.addEventListener("keyup", async (event: KeyboardEvent) => {
+function keyToDirection(directionKey: string): Direction | null {
+  switch (directionKey) {
+    case "up":
+      return Direction.Up;
+    case "down":
+      return Direction.Down;
+    case "left":
+      return Direction.Left;
+    case "right":
+      return Direction.Right;
+
+    default:
+      return null;
+  }
+}
+
+export function loadPlayerMoveEvents(
+  engine: Engine,
+  $directionButtonList: NodeListOf<HTMLButtonElement>
+): void {
+  document.addEventListener("keyup", (event: KeyboardEvent) => {
     switch (event.key) {
       case "ArrowUp":
       case "ArrowDown":
       case "ArrowLeft":
       case "ArrowRight":
-        await engine.move(
-          "player",
+        const direction = keyToDirection(
           event.key.replace("Arrow", "").toLowerCase()
         );
-        engine.render("player");
 
-        break;
-
-      case "Escape":
-      case " ":
-        await engine.nextOrHidePrompt();
-        break;
-
-      default:
+        if (direction) {
+          engine.movePlayer(direction);
+        }
         break;
     }
   });
-}
 
-export function LoadButtonEvents(
-  engine: Engine,
-  $directionButtonList: NodeListOf<HTMLButtonElement>,
-  $aButton: HTMLButtonElement,
-  $bButton: HTMLButtonElement
-) {
   Object.keys($directionButtonList).map((buttonKey: any) => {
     const $button = $directionButtonList[buttonKey];
     const directionKey = $button.getAttribute("data-direction") ?? "";
 
     $button.addEventListener("click", async () => {
-      await engine.move("player", directionKey);
-      engine.render("player");
+      const direction = keyToDirection(directionKey);
+
+      if (direction) {
+        engine.movePlayer(direction);
+      }
     });
   });
+}
 
-  $aButton.addEventListener("click", async () => {
-    await engine.nextOrHidePrompt();
-  });
+export function loadPromptEvents(engine: Engine): void {
+  document.addEventListener("keyup", (event: KeyboardEvent) => {
+    switch (event.key) {
+      case "Escape":
+        engine.hidePrompt();
+        break;
 
-  $bButton.addEventListener("click", async () => {
-    //
+      // space
+      case " ":
+        engine.nextOrHidePrompt();
+        break;
+    }
   });
 }
