@@ -41,93 +41,112 @@ export default class Renderer {
   renderScene(scene: Scene, focusedPosition: [number, number]): void {
     this.translate(focusedPosition, () => {
       if (scene.backgroundImage) {
-        const { tileDimension } = this;
-
-        this.context.drawImage(
-          scene.backgroundImage,
-          0,
-          0,
-          scene.size[0] * tileDimension[0],
-          scene.size[1] * tileDimension[1]
-        );
+        this.renderSceneBackground(scene);
       } else {
-        scene.data.map((row, rowIndex) => {
-          row.map((cellValue, columnIndex) => {
-            if (!cellValue) {
-              return;
-            }
-
-            const sceneEvent = scene.getEvent([columnIndex, rowIndex]);
-
-            this.context.fillStyle = sceneEvent ? "green" : "blue";
-
-            this.renderRawTile([columnIndex, rowIndex]);
-          });
-        });
+        this.renderSceneTiles(scene);
       }
     });
   }
 
-  renderPlayer(
-    player: Player,
-    spritePosition: [number, number],
-    focusedPosition: [number, number]
-  ): void {
+  renderPlayer(player: Player, focusedPosition: [number, number]): void {
     this.translate(focusedPosition, () => {
-      const { sprite, position } = player;
-      const { tileDimension } = this;
-
-      if (sprite) {
-        this.translate([-position[0], -position[1]], () => {
-          this.context.drawImage(
-            sprite,
-            (spritePosition[0] * sprite.width) / 4,
-            (spritePosition[1] * sprite.height) / 4,
-            sprite.width / 4,
-            sprite.height / 4,
-            0,
-            0,
-            tileDimension[0],
-            tileDimension[1]
-          );
-        });
+      if (player.sprite) {
+        this.renderPlayerSprite(player);
       } else {
-        this.context.fillStyle = "red";
-        this.renderRawTile(position);
+        this.renderPlayerTile(player);
+      }
+    });
+  }
 
-        const translatedPosition: [number, number] = [
-          position[0] * tileDimension[0] + tileDimension[0] / 2,
-          position[1] * tileDimension[1] + tileDimension[1] / 2,
-        ];
+  private renderPlayerSprite(player: Player): void {
+    const { sprite, position, spritePosition } = player;
+    const { tileDimension } = this;
 
-        let angle = 0; // Direction.Down
-        switch (player.direction) {
-          case Direction.Up:
-            angle = 180;
-            break;
+    if (!sprite || !spritePosition) {
+      return;
+    }
 
-          case Direction.Left:
-            angle = 90;
-            break;
+    this.translate([-position[0], -position[1]], () => {
+      this.context.drawImage(
+        sprite,
+        (spritePosition[0] * sprite.width) / 4,
+        (spritePosition[1] * sprite.height) / 4,
+        sprite.width / 4,
+        sprite.height / 4,
+        0,
+        0,
+        tileDimension[0],
+        tileDimension[1]
+      );
+    });
+  }
 
-          case Direction.Right:
-            angle = 270;
-            break;
+  private renderPlayerTile(player: Player): void {
+    const { position } = player;
+    const { tileDimension } = this;
+
+    this.context.fillStyle = "red";
+    this.renderRawTile(position);
+
+    const translatedPosition: [number, number] = [
+      position[0] * tileDimension[0] + tileDimension[0] / 2,
+      position[1] * tileDimension[1] + tileDimension[1] / 2,
+    ];
+
+    let angle = 0; // Direction.Down
+    switch (player.direction) {
+      case Direction.Up:
+        angle = 180;
+        break;
+
+      case Direction.Left:
+        angle = 90;
+        break;
+
+      case Direction.Right:
+        angle = 270;
+        break;
+    }
+
+    this.context.strokeStyle = "black";
+    this.context.lineWidth = 5;
+
+    this.rotate(angle, translatedPosition, () => {
+      this.context.beginPath();
+      this.context.moveTo(translatedPosition[0], translatedPosition[1]);
+      this.context.lineTo(
+        translatedPosition[0],
+        translatedPosition[1] + tileDimension[1] / 2
+      );
+      this.context.stroke();
+    });
+  }
+
+  private renderSceneBackground(scene: Scene): void {
+    const { tileDimension } = this;
+
+    this.context.drawImage(
+      scene.backgroundImage,
+      0,
+      0,
+      scene.size[0] * tileDimension[0],
+      scene.size[1] * tileDimension[1]
+    );
+  }
+
+  private renderSceneTiles(scene: Scene): void {
+    scene.data.map((row, rowIndex) => {
+      row.map((cellValue, columnIndex) => {
+        if (!cellValue) {
+          return;
         }
 
-        this.context.strokeStyle = "black";
-        this.context.lineWidth = 5;
+        const sceneEvent = scene.getEvent([columnIndex, rowIndex]);
 
-        this.rotate(angle, translatedPosition, () => {
-          this.context.beginPath();
-          this.context.moveTo(translatedPosition[0], translatedPosition[1]);
-          this.context.lineTo(
-            translatedPosition[0],
-            translatedPosition[1] + tileDimension[1] / 2
-          );
-          this.context.stroke();
-        });
-      }
+        this.context.fillStyle = sceneEvent ? "green" : "blue";
+
+        this.renderRawTile([columnIndex, rowIndex]);
+      });
     });
   }
 

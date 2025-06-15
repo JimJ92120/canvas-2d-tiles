@@ -5,90 +5,93 @@ export enum Direction {
   Right = "right",
 }
 
+export type SpriteData = {
+  imageUrl: string;
+  animationDuration: number;
+  direction: {
+    [Direction.Up]?: [number, number];
+    [Direction.Down]?: [number, number];
+    [Direction.Left]?: [number, number];
+    [Direction.Right]?: [number, number];
+  };
+  animation: {
+    [Direction.Up]?: [number, number][];
+    [Direction.Down]?: [number, number][];
+    [Direction.Left]?: [number, number][];
+    [Direction.Right]?: [number, number][];
+  };
+};
+
 export default class Player {
   position: [number, number];
   direction: Direction;
   readonly spriteUrl: string | null;
+  readonly spriteData: SpriteData | null;
   sprite: HTMLImageElement;
-  readonly animationDuration: number;
   isMoving: boolean = false;
+  private animationIndex: number = -1;
 
   constructor(
     position: Player["position"],
     direction: Player["direction"],
-    spriteUrl: Player["spriteUrl"],
-    animationDuration: Player["animationDuration"]
+    spriteData: Player["spriteData"]
   ) {
     this.position = position;
     this.direction = direction;
-    this.spriteUrl = spriteUrl;
-    this.animationDuration = animationDuration;
+    this.spriteData = spriteData;
   }
 
   async init(): Promise<void> {
-    if (!this.spriteUrl || "" === this.spriteUrl) {
+    if (!this.spriteData || "" === this.spriteData.imageUrl) {
       return;
     }
 
-    this.sprite = await this.loadImage(this.spriteUrl);
+    this.sprite = await this.loadImage(this.spriteData.imageUrl);
   }
 
-  getSpritePosition(): [number, number] {
-    switch (this.direction) {
-      case Direction.Up:
-        return [2, 0];
+  get spritePosition(): [number, number] | null {
+    if (!this.spriteData) {
+      return null;
+    }
 
-      case Direction.Down:
-        return [0, 0];
-
-      case Direction.Left:
-        return [1, 0];
-
-      case Direction.Right:
-        return [3, 0];
-
-      default:
-        return [0, 0];
+    if (
+      this.isMoving &&
+      0 <= this.animationIndex &&
+      this.spriteData.animation[this.direction]
+    ) {
+      return (
+        this.spriteData.animation[this.direction]![this.animationIndex!] ?? null
+      );
+    } else {
+      return this.spriteData.direction[this.direction] ?? null;
     }
   }
 
-  getSpriteAnimationPositionList(): [number, number][] {
-    switch (this.direction) {
-      case Direction.Up:
-        return [
-          [2, 0],
-          [2, 1],
-          [2, 2],
-          [2, 3],
-        ];
-
-      case Direction.Down:
-        return [
-          [0, 0],
-          [0, 1],
-          [0, 2],
-          [0, 3],
-        ];
-
-      case Direction.Left:
-        return [
-          [1, 0],
-          [1, 1],
-          [1, 2],
-          [1, 3],
-        ];
-
-      case Direction.Right:
-        return [
-          [3, 0],
-          [3, 1],
-          [3, 2],
-          [3, 3],
-        ];
-
-      default:
-        return [];
+  animate(): void {
+    if (!this.spriteData || !this.spriteData.animation[this.direction]) {
+      return;
     }
+
+    const positionList = this.spriteData.animation[this.direction]!;
+
+    if (!positionList.length) {
+      return;
+    }
+
+    this.isMoving = true;
+    this.animationIndex = 0;
+
+    const interval = setInterval(() => {
+      ++this.animationIndex!;
+
+      if (!positionList[this.animationIndex!]) {
+        this.animationIndex = -1;
+        this.isMoving = false;
+        clearInterval(interval);
+
+        return;
+      }
+    }, this.spriteData.animationDuration / positionList.length);
   }
 
   private async loadImage(imageUrl: string): Promise<HTMLImageElement> {
