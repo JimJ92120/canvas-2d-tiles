@@ -20,6 +20,7 @@ export default class Engine {
   private currentSceneName: string;
   private focusedPosition: [number, number] = [0, 0];
   private lastMapPosition: [number, number] | null = null;
+  private playerAnimationIndex: number | null = null;
 
   constructor(
     renderer: Engine["renderer"],
@@ -41,7 +42,7 @@ export default class Engine {
     return this.sceneRecord[this.currentSceneName];
   }
 
-  async init(): Promise<void> {
+  async init(welcomeMessage: string[] = []): Promise<void> {
     this.renderer.init();
 
     await Promise.all(
@@ -49,8 +50,13 @@ export default class Engine {
         return this.sceneRecord[sceneName].init();
       })
     );
+    await this.player.init();
 
     this.loadScene("map");
+
+    if (welcomeMessage.length) {
+      this.prompt.type(welcomeMessage);
+    }
   }
 
   async nextOrHidePrompt(): Promise<void> {
@@ -144,6 +150,10 @@ export default class Engine {
       this.prompt.hide();
     }
 
+    if (this.player.isMoving) {
+      return false;
+    }
+
     let nextPosition: Player["position"] = [...this.player.position];
     switch (direction) {
       case Direction.Up:
@@ -164,6 +174,7 @@ export default class Engine {
     }
 
     this.player.direction = direction;
+    this.animatePlayer();
 
     const sceneEvent = this.currentScene.getEvent(nextPosition);
 
@@ -185,7 +196,54 @@ export default class Engine {
 
   //
   private render(): void {
-    this.renderer.render(this.currentScene, this.player, this.focusedPosition);
+    this.renderer.clear();
+
+    this.renderer.renderScene(this.currentScene, this.focusedPosition);
+
+    if (this.player.isMoving) {
+      const spriteAnimationPositionList =
+        this.player.getSpriteAnimationPositionList();
+
+      if (!spriteAnimationPositionList[this.playerAnimationIndex!]) {
+        return;
+      }
+
+      this.renderer.renderPlayer(
+        this.player,
+        spriteAnimationPositionList[this.playerAnimationIndex!],
+        this.focusedPosition
+      );
+    } else {
+      this.renderer.renderPlayer(
+        this.player,
+        this.player.getSpritePosition(),
+        this.focusedPosition
+      );
+    }
+  }
+
+  private animatePlayer(): void {
+    const spriteAnimationPositionList =
+      this.player.getSpriteAnimationPositionList();
+
+    if (!spriteAnimationPositionList.length) {
+      return;
+    }
+
+    this.player.isMoving = true;
+    this.playerAnimationIndex = 0;
+
+    const interval = setInterval(() => {
+      ++this.playerAnimationIndex!;
+
+      if (!spriteAnimationPositionList[this.playerAnimationIndex!]) {
+        this.playerAnimationIndex = null;
+        this.player.isMoving = false;
+        clearInterval(interval);
+
+        return;
+      }
+    }, this.player.animationDuration / spriteAnimationPositionList.length);
   }
 
   private canPlayerMove(nextPosition: Player["position"]): boolean {

@@ -4,6 +4,7 @@ body {
   min-height: 100vh;
   background-color: black;
   color: white;
+  font-family: "Courier New", Courier, monospace;
 }
 
 body > * {
@@ -57,6 +58,9 @@ body > * {
   border: 1px solid black;
   border-radius: 50%;
   padding: 4px 5px;
+  height: 2rem;
+  width: 2rem;
+  font-weight: bold;
 }
 
 .controls__direction {
@@ -64,10 +68,8 @@ body > * {
   flex-flow: column;
   margin-right: auto;
 }
-.direction-button {
-  height: 2rem;
-  width: 2rem;
-}
+/* .direction-button {
+} */
 .direction-button[data-direction="down"],
 .direction-button[data-direction="up"] {
   margin-left: auto;
@@ -86,5 +88,5 @@ body > * {
   margin-left: auto;
 }
 .select-button[data-select="b"] {
-  margin-right: 1rem;
+  margin-right: 2rem;
 }

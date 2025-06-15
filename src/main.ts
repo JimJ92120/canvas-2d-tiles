@@ -1,13 +1,13 @@
 import "./style.css";
 
 import App from "./App";
-import Engine, { Direction } from "./engine";
+import Engine from "./engine";
 import Renderer from "./engine/Renderer";
-import Player from "./engine/components/Player";
+import Prompt from "./engine/Prompt";
 
+import player from "./components/player";
 import sceneRecord from "./components/sceneRecord";
 import { loadPromptEvents, loadPlayerMoveEvents } from "./components/events";
-import Prompt from "./engine/Prompt";
 
 document.addEventListener("DOMContentLoaded", async () => {
   const app = new App(document.querySelector("#app")!);
@@ -21,10 +21,10 @@ document.addEventListener("DOMContentLoaded", async () => {
       "grey"
     ),
     new Prompt(app.$container.querySelector(".prompt")!, "prompt--active", 100),
-    new Player([0, 0], Direction.Down),
+    player,
     sceneRecord
   );
-  await engine.init();
+  await engine.init(["Hello World!\nWelcome to my Portfolio"]);
   engine.run();
 
   loadPlayerMoveEvents(
@@ -36,4 +36,6 @@ document.addEventListener("DOMContentLoaded", async () => {
     app.$container.querySelector('.select-button[data-select="a"]')!,
     app.$container.querySelector('.select-button[data-select="b"]')!
   );
+
+  // setTimeout(() => engine.stop(), 2000);
 });
