@@ -1,36 +1,36 @@
 export default class Prompt {
-  private $container: HTMLElement;
-  readonly activeClassName: string;
-  readonly typingSpeed: number;
+  #$container: HTMLElement;
+  #activeClassName: string;
+  #typingSpeed: number;
 
-  private typingInterval: any;
-  private currentContent: string[] = [];
-  private currentContentIndex: number = 0;
+  #typingInterval: any;
+  #currentContent: string[] = [];
+  #currentContentIndex: number = 0;
 
   constructor(
-    $container: Prompt["$container"],
-    activeClassName: Prompt["activeClassName"],
-    typingSpeed: Prompt["typingSpeed"]
+    $container: HTMLElement,
+    activeClassName: string,
+    typingSpeed: number
   ) {
-    this.$container = $container;
-    this.activeClassName = activeClassName;
-    this.typingSpeed = typingSpeed;
+    this.#$container = $container;
+    this.#activeClassName = activeClassName;
+    this.#typingSpeed = typingSpeed;
   }
 
   get isShown(): boolean {
-    return this.$container.classList.contains(this.activeClassName);
+    return this.#$container.classList.contains(this.#activeClassName);
   }
 
   get isTyping(): boolean {
-    return Boolean(this.typingInterval) || 0 < this.currentContent.length;
+    return Boolean(this.#typingInterval) || 0 < this.#currentContent.length;
   }
 
   async type(content: string[]): Promise<void> {
     this.reset();
 
-    this.currentContent = content;
+    this.#currentContent = content;
 
-    return this.typeText(this.currentContent[this.currentContentIndex]);
+    return this.typeText(this.#currentContent[this.#currentContentIndex]);
   }
 
   async nextOrHide(): Promise<void> {
@@ -38,22 +38,22 @@ export default class Prompt {
       throw new Error("prompt not shown");
     }
 
-    if (!this.currentContent[this.currentContentIndex + 1]) {
+    if (!this.#currentContent[this.#currentContentIndex + 1]) {
       this.hide();
 
       return;
     }
 
-    ++this.currentContentIndex;
+    ++this.#currentContentIndex;
 
-    return this.typeText(this.currentContent[this.currentContentIndex]);
+    return this.typeText(this.#currentContent[this.#currentContentIndex]);
   }
 
   hide(): void {
     this.clear();
     this.reset();
 
-    this.$container.classList.remove(this.activeClassName);
+    this.#$container.classList.remove(this.#activeClassName);
   }
 
   private async typeText(text: string): Promise<void> {
@@ -64,16 +64,16 @@ export default class Prompt {
     let rowIndex = 0;
     let charIndex = 0;
 
-    this.$container.classList.add(this.activeClassName);
+    this.#$container.classList.add(this.#activeClassName);
 
     return new Promise((resolve) => {
-      this.typingInterval = setInterval(() => {
+      this.#typingInterval = setInterval(() => {
         try {
           if (0 === charIndex && 0 !== rowIndex) {
-            this.$container.textContent += "\n";
+            this.#$container.textContent += "\n";
           }
 
-          this.$container.textContent += split[rowIndex][charIndex];
+          this.#$container.textContent += split[rowIndex][charIndex];
 
           if (split[rowIndex].length <= charIndex + 1) {
             ++rowIndex;
@@ -84,27 +84,27 @@ export default class Prompt {
         } catch (error) {
           this.clearTypingInterval();
         }
-      }, this.typingSpeed);
+      }, this.#typingSpeed);
 
       resolve();
     });
   }
 
   private reset(): void {
-    this.currentContent = [];
-    this.currentContentIndex = 0;
+    this.#currentContent = [];
+    this.#currentContentIndex = 0;
 
     this.clear();
   }
 
   private clear(): void {
-    this.$container.innerHTML = "";
+    this.#$container.innerHTML = "";
 
     this.clearTypingInterval();
   }
 
   private clearTypingInterval(): void {
-    clearInterval(this.typingInterval);
-    this.typingInterval = 0;
+    clearInterval(this.#typingInterval);
+    this.#typingInterval = 0;
   }
 }
