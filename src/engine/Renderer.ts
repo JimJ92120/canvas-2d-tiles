@@ -50,7 +50,7 @@ export default class Renderer {
 
   renderPlayer(player: Player, focusedPosition: [number, number]): void {
     this.translate(focusedPosition, () => {
-      if (player.sprite) {
+      if (player.sprite && player.spritePosition) {
         this.renderPlayerSprite(player);
       } else {
         this.renderPlayerTile(player);
