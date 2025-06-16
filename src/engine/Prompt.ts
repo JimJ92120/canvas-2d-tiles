@@ -67,7 +67,7 @@ export default class Prompt {
             this.#$dialog.textContent += "\n";
           }
 
-          this.#$dialog.textContent += split[rowIndex][charIndex];
+          this.#$dialog.textContent += split[rowIndex][charIndex] ?? "\n";
 
           if (split[rowIndex].length <= charIndex + 1) {
             ++rowIndex;
