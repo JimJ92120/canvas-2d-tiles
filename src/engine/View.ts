@@ -44,7 +44,7 @@ export default class View {
       "frame",
       "frameset",
       "head",
-      "html",
+      "html", // not removed
       "iframe",
       "script",
       "style",
