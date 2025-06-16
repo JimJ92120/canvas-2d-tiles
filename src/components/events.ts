@@ -73,8 +73,6 @@ export function loadPromptEvents(
 
   $aButton.addEventListener("click", async () => {
     await engine.nextOrHidePrompt();
-
-    engine.hideDialogs();
   });
 
   $bButton.addEventListener("click", async () => {
