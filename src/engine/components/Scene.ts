@@ -1,6 +1,7 @@
 export enum SceneEventType {
   Load = "load",
   Prompt = "prompt",
+  View = "view",
 }
 
 export type SceneEvent = {

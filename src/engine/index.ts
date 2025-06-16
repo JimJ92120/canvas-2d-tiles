@@ -2,6 +2,7 @@ import Player, { Direction } from "./components/Player";
 import Scene, { SceneEvent, SceneEventType } from "./components/Scene";
 import Prompt from "./Prompt";
 import Renderer from "./Renderer";
+import View from "./View";
 
 export type SceneRecord = {
   map: Scene;
@@ -12,9 +13,11 @@ export { Direction };
 
 export default class Engine {
   #renderer: Renderer;
+  #prompt: Prompt;
+  #view: View;
+
   #player: Player;
   #sceneRecord: SceneRecord;
-  #prompt: Prompt;
 
   #animationFrame: number;
   #currentSceneName: string;
@@ -24,11 +27,14 @@ export default class Engine {
   constructor(
     renderer: Renderer,
     prompt: Prompt,
+    view: View,
     player: Player,
     sceneRecord: SceneRecord
   ) {
     this.#renderer = renderer;
     this.#prompt = prompt;
+    this.#view = view;
+
     this.#player = player;
     this.#sceneRecord = sceneRecord;
   }
@@ -64,6 +70,10 @@ export default class Engine {
 
   hidePrompt(): void {
     return this.#prompt.hide();
+  }
+
+  hideView(): void {
+    return this.#view.hide();
   }
 
   run(): void {
@@ -112,8 +122,12 @@ export default class Engine {
   }
 
   async movePlayer(direction: Direction): Promise<boolean> {
-    if (this.#prompt.isTyping) {
-      this.#prompt.hide();
+    if (this.#prompt.isTyping || this.#prompt.isShown) {
+      this.hidePrompt();
+    }
+
+    if (this.#view.isShown) {
+      this.hideView();
     }
 
     if (this.#player.isMoving) {
@@ -223,6 +237,9 @@ export default class Engine {
 
       case SceneEventType.Prompt:
         return this.#prompt.type(sceneEvent.data);
+
+      case SceneEventType.View:
+        return this.#view.render(sceneEvent.data);
     }
   }
 }

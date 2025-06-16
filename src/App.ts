@@ -11,6 +11,7 @@ export default class App {
         <canvas class="scene"></canvas>
 
         <dialog class="prompt">Hello Prompt</dialog>
+        <dialog class="view">Hello View</dialog>
       </div>
 
       <div class="controls">

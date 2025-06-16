@@ -33,12 +33,12 @@ export default {
         data: "home",
       },
       "7:2": {
-        type: SceneEventType.Load,
-        data: "home",
-      },
-      "8:2": {
         type: SceneEventType.Prompt,
         data: ["a large building", "it is closed"],
+      },
+      "8:2": {
+        type: SceneEventType.View,
+        data: "#test",
       },
       "16:2": {
         type: SceneEventType.Prompt,

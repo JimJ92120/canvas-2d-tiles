@@ -8,6 +8,7 @@ import Prompt from "./engine/Prompt";
 import player from "./components/player";
 import sceneRecord from "./components/sceneRecord";
 import { loadPromptEvents, loadPlayerMoveEvents } from "./components/events";
+import View from "./engine/View";
 
 document.addEventListener("DOMContentLoaded", async () => {
   const app = new App(document.querySelector("#app")!);
@@ -21,6 +22,7 @@ document.addEventListener("DOMContentLoaded", async () => {
       "grey"
     ),
     new Prompt(app.$container.querySelector(".prompt")!, 100),
+    new View(app.$container.querySelector(".view")!),
     player,
     sceneRecord
   );
@@ -36,6 +38,4 @@ document.addEventListener("DOMContentLoaded", async () => {
     app.$container.querySelector('.select-button[data-select="a"]')!,
     app.$container.querySelector('.select-button[data-select="b"]')!
   );
-
-  // setTimeout(() => engine.stop(), 2000);
 });

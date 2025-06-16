@@ -60,21 +60,26 @@ export function loadPromptEvents(
     switch (event.key) {
       case "Escape":
         engine.hidePrompt();
+        engine.hideView();
         break;
 
       // space
       case " ":
       case "Enter":
         await engine.nextOrHidePrompt();
+        engine.hideView();
         break;
     }
   });
 
   $aButton.addEventListener("click", async () => {
     await engine.nextOrHidePrompt();
+
+    engine.hideView();
   });
 
   $bButton.addEventListener("click", async () => {
     engine.hidePrompt();
+    engine.hideView();
   });
 }
