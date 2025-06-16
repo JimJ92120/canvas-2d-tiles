@@ -27,7 +27,7 @@ body > * {
 }
 
 /*  */
-.prompt {
+dialog {
   background-color: white;
   color: black;
   text-align: left;
@@ -41,61 +41,24 @@ body > * {
   width: calc(100% - 2rem);
   white-space: pre-wrap;
 }
-.prompt[open] {
+dialog[open] {
   display: block;
 }
-.prompt * {
+dialog * {
   font-size: 1rem;
   margin: 0;
   padding: 0;
 }
 
 .view {
-  background-color: white;
-  color: black;
-  text-align: left;
-  border: none !important;
-  outline: none !important;
-
-  display: none;
-  position: absolute;
-  bottom: 0;
-  padding: 1rem;
   height: calc(100% - 2rem);
-  width: calc(100% - 2rem);
-  white-space: pre-wrap;
-}
-.view[open] {
-  display: block;
-}
-.view * {
-  font-size: 1rem;
-  margin: 0;
-  padding: 0;
 }
 
-.menu {
-  background-color: white;
-  color: black;
-  text-align: left;
-  border: none !important;
-  outline: none !important;
-
-  display: none;
-  position: absolute;
-  bottom: 0;
-  padding: 1rem;
-  width: calc(100% - 2rem);
-  white-space: pre-wrap;
-}
 .menu[open] {
   display: flex;
   flex-flow: row wrap;
 }
-.menu a {
-  font-size: 1rem;
-  margin: 0;
-  padding: 0;
+.menu * {
   width: 50%;
   cursor: pointer;
 }
