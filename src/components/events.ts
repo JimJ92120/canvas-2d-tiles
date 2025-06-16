@@ -66,7 +66,6 @@ export function loadPromptEvents(
       case " ":
       case "Enter":
         await engine.nextOrHidePrompt();
-        engine.hideDialogs();
         break;
     }
   });
