@@ -9,14 +9,14 @@ export default class View {
     return this.#$dialog.open;
   }
 
-  render(templateId: string): void {
+  render(templateSelector: string): void {
     this.clear();
 
     const $template: HTMLTemplateElement | null =
-      document.querySelector(templateId);
+      document.querySelector(templateSelector);
 
     if (!$template) {
-      throw new Error(`template "${templateId}" doesn't exist`);
+      throw new Error(`template "${templateSelector}" doesn't exist`);
     }
 
     this.cleanTemplateContent($template);
