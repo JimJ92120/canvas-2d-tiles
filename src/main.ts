@@ -29,7 +29,10 @@ document.addEventListener("DOMContentLoaded", async () => {
     player,
     sceneRecord
   );
-  await engine.init(["Hello World!\nWelcome!"]);
+  await engine.init([
+    "Hello World!\nUse buttons or keyboard to move around and interact with the scene\n\nClick on A button, Enter key or Space key to show instructions",
+    "Use A button, Enter key or Space key to slide through content (when available)\n\nUse B, Escape key or move the Player to hide dialogs",
+  ]);
   engine.run();
 
   loadPlayerMoveEvents(
