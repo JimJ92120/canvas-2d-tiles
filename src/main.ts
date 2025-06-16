@@ -29,7 +29,7 @@ document.addEventListener("DOMContentLoaded", async () => {
     player,
     sceneRecord
   );
-  await engine.init(["Hello World!\nWelcome to my Portfolio"]);
+  await engine.init(["Hello World!\nWelcome!"]);
   engine.run();
 
   loadPlayerMoveEvents(
