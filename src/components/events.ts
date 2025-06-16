@@ -59,15 +59,14 @@ export function loadPromptEvents(
   document.addEventListener("keyup", async (event: KeyboardEvent) => {
     switch (event.key) {
       case "Escape":
-        engine.hidePrompt();
-        engine.hideView();
+        engine.hideDialogs();
         break;
 
       // space
       case " ":
       case "Enter":
         await engine.nextOrHidePrompt();
-        engine.hideView();
+        engine.hideDialogs();
         break;
     }
   });
@@ -75,11 +74,10 @@ export function loadPromptEvents(
   $aButton.addEventListener("click", async () => {
     await engine.nextOrHidePrompt();
 
-    engine.hideView();
+    engine.hideDialogs();
   });
 
   $bButton.addEventListener("click", async () => {
-    engine.hidePrompt();
-    engine.hideView();
+    engine.hideDialogs();
   });
 }

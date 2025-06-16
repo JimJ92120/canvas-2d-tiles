@@ -41,8 +41,37 @@ export default {
         data: "#test",
       },
       "16:2": {
-        type: SceneEventType.Prompt,
-        data: ["a small building"],
+        type: SceneEventType.Menu,
+        data: [
+          {
+            title: "#1",
+            event: {
+              type: SceneEventType.Prompt,
+              data: ["Hello World"],
+            },
+          },
+          {
+            title: "#2",
+            event: {
+              type: SceneEventType.View,
+              data: "#test",
+            },
+          },
+          {
+            title: "#3",
+            event: {
+              type: SceneEventType.Prompt,
+              data: ["Hello World"],
+            },
+          },
+          {
+            title: "#4",
+            event: {
+              type: SceneEventType.View,
+              data: "#test",
+            },
+          },
+        ],
       },
       //
       "14:10": {

@@ -1,9 +1,11 @@
 import "./style.css";
 
 import App from "./App";
+
 import Engine from "./engine";
 import Renderer from "./engine/Renderer";
 import Prompt from "./engine/Prompt";
+import Menu from "./engine/Menu";
 
 import player from "./components/player";
 import sceneRecord from "./components/sceneRecord";
@@ -23,6 +25,7 @@ document.addEventListener("DOMContentLoaded", async () => {
     ),
     new Prompt(app.$container.querySelector(".prompt")!, 100),
     new View(app.$container.querySelector(".view")!),
+    new Menu(app.$container.querySelector(".menu")!),
     player,
     sceneRecord
   );

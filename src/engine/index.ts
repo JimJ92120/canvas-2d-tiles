@@ -1,5 +1,6 @@
 import Player, { Direction } from "./components/Player";
 import Scene, { SceneEvent, SceneEventType } from "./components/Scene";
+import Menu from "./Menu";
 import Prompt from "./Prompt";
 import Renderer from "./Renderer";
 import View from "./View";
@@ -15,6 +16,7 @@ export default class Engine {
   #renderer: Renderer;
   #prompt: Prompt;
   #view: View;
+  #menu: Menu;
 
   #player: Player;
   #sceneRecord: SceneRecord;
@@ -28,12 +30,14 @@ export default class Engine {
     renderer: Renderer,
     prompt: Prompt,
     view: View,
+    menu: Menu,
     player: Player,
     sceneRecord: SceneRecord
   ) {
     this.#renderer = renderer;
     this.#prompt = prompt;
     this.#view = view;
+    this.#menu = menu;
 
     this.#player = player;
     this.#sceneRecord = sceneRecord;
@@ -68,12 +72,10 @@ export default class Engine {
     return this.#prompt.nextOrHide();
   }
 
-  hidePrompt(): void {
-    return this.#prompt.hide();
-  }
-
-  hideView(): void {
-    return this.#view.hide();
+  hideDialogs(): void {
+    this.#prompt.hide();
+    this.#view.hide();
+    this.#menu.hide();
   }
 
   run(): void {
@@ -122,13 +124,7 @@ export default class Engine {
   }
 
   async movePlayer(direction: Direction): Promise<boolean> {
-    if (this.#prompt.isTyping || this.#prompt.isShown) {
-      this.hidePrompt();
-    }
-
-    if (this.#view.isShown) {
-      this.hideView();
-    }
+    this.hideDialogs();
 
     if (this.#player.isMoving) {
       return false;
@@ -231,6 +227,8 @@ export default class Engine {
   }
 
   private async runSceneEvent(sceneEvent: SceneEvent): Promise<void> {
+    this.hideDialogs();
+
     switch (sceneEvent.type) {
       case SceneEventType.Load:
         return this.loadScene(sceneEvent.data);
@@ -240,6 +238,12 @@ export default class Engine {
 
       case SceneEventType.View:
         return this.#view.render(sceneEvent.data);
+
+      case SceneEventType.Menu:
+        return this.#menu.render(sceneEvent.data, ($element, menuItem) => {
+          this.hideDialogs();
+          this.runSceneEvent(menuItem.event);
+        });
     }
   }
 }

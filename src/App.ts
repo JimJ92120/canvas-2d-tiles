@@ -12,6 +12,7 @@ export default class App {
 
         <dialog class="prompt">Hello Prompt</dialog>
         <dialog class="view">Hello View</dialog>
+        <dialog class="menu">Hello Menu</dialog>
       </div>
 
       <div class="controls">

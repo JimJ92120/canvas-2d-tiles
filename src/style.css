@@ -26,6 +26,7 @@ body > * {
   max-height: 500px;
 }
 
+/*  */
 .prompt {
   background-color: white;
   color: black;
@@ -73,6 +74,33 @@ body > * {
   padding: 0;
 }
 
+.menu {
+  background-color: white;
+  color: black;
+  text-align: left;
+  border: none !important;
+  outline: none !important;
+
+  display: none;
+  position: absolute;
+  bottom: 0;
+  padding: 1rem;
+  width: calc(100% - 2rem);
+  white-space: pre-wrap;
+}
+.menu[open] {
+  display: flex;
+  flex-flow: row wrap;
+}
+.menu a {
+  font-size: 1rem;
+  margin: 0;
+  padding: 0;
+  width: 50%;
+  cursor: pointer;
+}
+
+/*  */
 .controls {
   display: flex;
   flex-flow: row wrap;
