@@ -20,7 +20,7 @@ export default class Scene {
   readonly eventRecord: SceneEventRecord;
   readonly initialPlayerPosition: [number, number];
   readonly backgroundImageUrl: string | null;
-  backgroundImage: HTMLImageElement;
+  #backgroundImage: HTMLImageElement | null = null;
 
   constructor(
     name: Scene["name"],
@@ -40,12 +40,16 @@ export default class Scene {
     return [this.data[0] ? this.data[0].length : 0, this.data.length];
   }
 
+  get backgroundImage(): HTMLImageElement | null {
+    return this.#backgroundImage;
+  }
+
   async init(): Promise<void> {
     if (!this.backgroundImageUrl || "" === this.backgroundImageUrl) {
       return;
     }
 
-    this.backgroundImage = await this.loadImage(this.backgroundImageUrl);
+    this.#backgroundImage = await this.loadImage(this.backgroundImageUrl);
   }
 
   getEvent(position: [number, number]): SceneEvent | null {

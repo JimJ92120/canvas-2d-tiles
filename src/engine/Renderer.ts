@@ -121,6 +121,9 @@ export default class Renderer {
   }
 
   private renderSceneBackground(scene: Scene): void {
+    if (!scene.backgroundImage) {
+      throw new Error(`missing background image for scene "${scene.name}"`);
+    }
     this.#context.drawImage(
       scene.backgroundImage,
       0,
