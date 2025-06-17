@@ -12,14 +12,26 @@ import sceneRecord from "./components/sceneRecord";
 import { loadPromptEvents, loadPlayerMoveEvents } from "./components/events";
 import View from "./engine/View";
 
+function getScreenSize(maxSceneSize: number): number {
+  const { width, height } = window.screen;
+  let size = height <= width ? height : width;
+
+  if (maxSceneSize < size) {
+    size = maxSceneSize;
+  }
+
+  return size;
+}
+
 document.addEventListener("DOMContentLoaded", async () => {
   const app = new App(document.querySelector("#app")!);
   app.render();
 
+  const maxSceneSize = getScreenSize(500);
   const engine = new Engine(
     new Renderer(
       app.$container.querySelector(".scene")!,
-      [500, 500],
+      [maxSceneSize, maxSceneSize],
       [10, 10],
       "grey"
     ),
