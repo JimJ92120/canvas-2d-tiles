@@ -8,6 +8,7 @@ export enum Direction {
 export type SpriteData = {
   imageUrl: string;
   animationDuration: number;
+  size: [number, number];
   direction: {
     [Direction.Up]?: [number, number];
     [Direction.Down]?: [number, number];
@@ -38,6 +39,10 @@ export default class Player {
     this.position = position;
     this.direction = direction;
     this.#spriteData = spriteData;
+  }
+
+  get spriteSize(): [number, number] {
+    return this.#spriteData ? this.#spriteData.size : [0, 0];
   }
 
   async init(): Promise<void> {

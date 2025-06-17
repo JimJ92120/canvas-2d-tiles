@@ -59,19 +59,19 @@ export default class Renderer {
   }
 
   private renderPlayerSprite(player: Player): void {
-    const { sprite, position, spritePosition } = player;
+    const { sprite, position, spritePosition, spriteSize } = player;
 
-    if (!sprite || !spritePosition) {
+    if (!sprite || !spritePosition || !spriteSize) {
       return;
     }
 
     this.translate([-position[0], -position[1]], () => {
       this.#context.drawImage(
         sprite,
-        (spritePosition[0] * sprite.width) / 4,
-        (spritePosition[1] * sprite.height) / 4,
-        sprite.width / 4,
-        sprite.height / 4,
+        (spritePosition[0] * sprite.width) / spriteSize[0],
+        (spritePosition[1] * sprite.height) / spriteSize[1],
+        sprite.width / spriteSize[0],
+        sprite.height / spriteSize[1],
         0,
         0,
         this.#tileDimension[0],

@@ -5,6 +5,7 @@ import PlayerSpriteUrl from "../assets/player.png";
 export default new Player([0, 0], Direction.Down, {
   imageUrl: PlayerSpriteUrl,
   animationDuration: 100,
+  size: [4, 4],
   direction: {
     [Direction.Up]: [2, 0],
     [Direction.Down]: [0, 0],
