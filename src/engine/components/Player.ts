@@ -26,9 +26,10 @@ export type SpriteData = {
 export default class Player {
   position: [number, number];
   direction: Direction;
+
   #spriteData: SpriteData | null;
-  sprite: HTMLImageElement;
-  isMoving: boolean = false;
+  #sprite: HTMLImageElement | null = null;
+  #isMoving: boolean = false;
   #animationIndex: number = -1;
 
   constructor(
@@ -45,12 +46,20 @@ export default class Player {
     return this.#spriteData ? this.#spriteData.size : [0, 0];
   }
 
+  get sprite(): HTMLImageElement | null {
+    return this.#sprite;
+  }
+
+  get isMoving(): boolean {
+    return this.#isMoving;
+  }
+
   async init(): Promise<void> {
     if (!this.#spriteData || "" === this.#spriteData.imageUrl) {
       return;
     }
 
-    this.sprite = await this.loadImage(this.#spriteData.imageUrl);
+    this.#sprite = await this.loadImage(this.#spriteData.imageUrl);
   }
 
   get spritePosition(): [number, number] | null {
@@ -59,7 +68,7 @@ export default class Player {
     }
 
     if (
-      this.isMoving &&
+      this.#isMoving &&
       0 <= this.#animationIndex &&
       this.#spriteData.animation[this.direction]
     ) {
@@ -83,7 +92,7 @@ export default class Player {
       return;
     }
 
-    this.isMoving = true;
+    this.#isMoving = true;
     this.#animationIndex = 0;
 
     const interval = setInterval(() => {
@@ -91,7 +100,7 @@ export default class Player {
 
       if (!positionList[this.#animationIndex!]) {
         this.#animationIndex = -1;
-        this.isMoving = false;
+        this.#isMoving = false;
         clearInterval(interval);
 
         return;
